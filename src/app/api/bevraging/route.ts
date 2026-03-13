@@ -181,9 +181,18 @@ export async function GET(request: NextRequest) {
     }
     
     // Zoek de rij die overeenkomt met het ingelogde emailadres
+    const userEmail = session.user?.email;
+    if (!userEmail) {
+      return NextResponse.json({
+        email: session.user?.email,
+        heeftBevraging: false,
+        message: 'Geen email gevonden'
+      });
+    }
+
     const userRow = rows.find((row: any) => {
       const email = row[emailKolom];
-      return email && email.toString().toLowerCase() === session.user.email!.toLowerCase();
+      return email && email.toString().toLowerCase() === userEmail.toLowerCase();
     });
     
     if (!userRow) {

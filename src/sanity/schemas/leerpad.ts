@@ -123,8 +123,9 @@ export default defineType({
       subtitle: 'profiel',
       media: 'afbeelding',
     },
-    prepare({ title, subtitle, media }) {
-      const profileEmoji = {
+    prepare(selection: Record<string, any>) {
+      const { title, subtitle, media } = selection;
+      const profileEmoji: Record<string, string> = {
         starter: '🌱',
         integrator: '🔍',
         expert: '🔧',
@@ -132,8 +133,8 @@ export default defineType({
         'ai-verplicht': '🤖',
       }
       return {
-        title,
-        subtitle: `${profileEmoji[subtitle] || ''} ${subtitle}`,
+        title: title as string,
+        subtitle: `${profileEmoji[subtitle as string] || ''} ${subtitle}`,
         media,
       }
     },

@@ -131,9 +131,10 @@ export default defineType({
       title: 'titel',
       subtitle: 'duur',
     },
-    prepare({ title, subtitle }) {
+    prepare(selection: Record<string, any>) {
+      const { title, subtitle } = selection;
       return {
-        title,
+        title: title as string,
         subtitle: `${subtitle} min`,
       }
     },
