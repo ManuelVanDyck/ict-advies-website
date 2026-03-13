@@ -51,7 +51,6 @@ const ANSWER_SCORES: Record<string, number> = {
   
   // AI Literacy - Gebruik
   'Ik gebruik AI voor eenvoudige taken': 2,
-  'Ik gebruik AI voor eenvoudige taken': 2,
   'Ik integreer AI creatief in mijn lessen': 3,
   'Ik configureer en pas AI-systemen aan': 4,
   
@@ -67,31 +66,22 @@ const ANSWER_SCORES: Record<string, number> = {
   'Ik kan de meeste voorwaarden uitleggen': 3,
   'Ik pas ze actief toe in mijn werk': 3,
   
-  // Verantwoorde AI - Sleutelvoorwaarden
-  'Ik herken enkele termen': 2,
-  'Ik kan de meeste voorwaarden uitleggen': 3,
-  'Ik pas ze actief toe in mijn werk': 3,
-  
   // Verantwoorde AI - Stappen
-  'Ik test een tool en beslis direct': 2,
   'Ik test een tool en beslis direct': 2,
   'Ik vergelijk tools en lees reviews': 3,
   'Ik volg een systematische evaluatiemethode': 3,
   
   // Verantwoorde AI - Verantwoordelijkheid
   'Vooral de ICT-coördinator': 2,
-  'Vooral de ICT-coördinator': 2,
   'Ik neem zelf verantwoordelijkheid': 3,
   'We delen verantwoordelijkheid als team': 3,
   
   // Verantwoorde AI - Evaluatie
   'Ik kijk naar gebruiksvriendelijkheid': 2,
-  'Ik kijk naar gebruiksvriendelijkheid': 2,
   'Ik betrek collega\'s bij de keuze': 3,
   'Ik gebruik een evaluatiekader': 3,
   
   // Verantwoorde AI - Samenwerking
-  'Ik deel soms ervaringen met collega\'s': 2,
   'Ik deel soms ervaringen met collega\'s': 2,
   'Ik organiseer sessies om kennis te delen': 3,
   'Ik begeleid collega\'s bij AI-implementatie': 3,
