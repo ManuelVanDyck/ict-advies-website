@@ -1,13 +1,15 @@
 // Script om opdracht toe te voegen aan een tutorial
 // Run: node scripts/add-opdracht.js
 
+require('dotenv').config({ path: '.env.local' });
+
 const { createClient } = require('@sanity/client');
 
 const client = createClient({
   projectId: 'mgu8mw2o',
   dataset: 'production',
   apiVersion: '2024-01-01',
-  token: 'process.env.SANITY_API_TOKEN',
+  token: process.env.SANITY_API_TOKEN,
   useCdn: false,
 });
 
