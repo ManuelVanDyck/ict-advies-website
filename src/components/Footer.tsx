@@ -3,7 +3,7 @@ import { Mail, MapPin } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-brand-green text-white mt-auto">
+    <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white mt-auto">
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           <div>
@@ -15,14 +15,14 @@ export default function Footer() {
               />
               <span>ICT-Advies</span>
             </Link>
-            <p className="text-white/80 text-sm leading-relaxed">
+            <p className="text-gray-400 text-sm leading-relaxed">
               Handleidingen en tips voor leerkrachten over Clevertouch borden en Google Workspace.
             </p>
           </div>
           
           <div>
             <h4 className="font-semibold mb-4">Snel naar</h4>
-            <ul className="space-y-3 text-sm text-white/80">
+            <ul className="space-y-3 text-sm text-gray-400">
               <li>
                 <Link href="/tutorials" className="hover:text-brand-orange transition-colors flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-brand-orange rounded-full"></span>
@@ -42,9 +42,9 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/tips" className="hover:text-brand-orange transition-colors flex items-center gap-2">
+                <Link href="/tutorials?categorie=ai-tools" className="hover:text-brand-orange transition-colors flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-brand-orange rounded-full"></span>
-                  EduTools
+                  AI Tools
                 </Link>
               </li>
             </ul>
@@ -52,7 +52,7 @@ export default function Footer() {
           
           <div>
             <h4 className="font-semibold mb-4">Contact</h4>
-            <ul className="space-y-3 text-sm text-white/80">
+            <ul className="space-y-3 text-sm text-gray-400">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-brand-orange" />
                 <a href="mailto:ict@atheneumgentbrugge.be" className="hover:text-brand-orange transition-colors">
@@ -67,7 +67,7 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="border-t border-white/20 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/60">
+        <div className="border-t border-white/10 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
           <p>© {new Date().getFullYear()} ICT-Advies - GO! atheneum Gentbrugge</p>
           <p>Met ondersteuning van GO! onderwijs</p>
         </div>

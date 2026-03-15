@@ -151,16 +151,16 @@ export default function OpdrachtComponent({
   };
 
   return (
-    <div className="mt-8 p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200">
-      <h3 className="text-xl font-bold text-green-800 mb-4 flex items-center gap-2">
+    <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-8 md:p-10 overflow-hidden shadow-xl">
+      <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
         📋 {opdracht.titel}
       </h3>
       
       <div className="space-y-4">
         {/* Instructie */}
-        <div className="bg-white p-4 rounded-lg">
-          <h4 className="font-semibold text-gray-700 mb-2">Instructie:</h4>
-          <p className="text-gray-600 whitespace-pre-wrap">{opdracht.instructie}</p>
+        <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+          <h4 className="font-semibold text-white mb-2">Instructie:</h4>
+          <p className="text-gray-300 whitespace-pre-wrap">{opdracht.instructie}</p>
         </div>
 
         {/* Template Link */}
@@ -169,23 +169,23 @@ export default function OpdrachtComponent({
             href={opdracht.templateSheetUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green text-white rounded-lg hover:bg-brand-green/90 transition"
           >
             📂 Open Template Sheet
           </a>
         )}
 
         {/* Criteria */}
-        <div className="bg-white p-4 rounded-lg">
-          <h4 className="font-semibold text-gray-700 mb-2">Beoordelingscriteria:</h4>
+        <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+          <h4 className="font-semibold text-white mb-3">Beoordelingscriteria:</h4>
           <ul className="space-y-2">
             {opdracht.criteria.map((criterium, index) => (
               <li key={index} className="flex items-start gap-2">
-                <span className="text-green-600 font-bold">✓</span>
+                <span className="text-brand-orange font-bold">✓</span>
                 <div>
-                  <span className="font-medium">{criterium.naam}</span>
+                  <span className="font-medium text-white">{criterium.naam}</span>
                   {criterium.beschrijving && (
-                    <span className="text-gray-500 text-sm ml-2">
+                    <span className="text-gray-400 text-sm ml-2">
                       ({criterium.beschrijving})
                     </span>
                   )}
@@ -197,18 +197,18 @@ export default function OpdrachtComponent({
 
         {/* Deadline */}
         {opdracht.deadline && (
-          <div className="flex items-center gap-2 text-orange-600">
+          <div className="flex items-center gap-2 text-brand-orange font-medium">
             ⏰ Deadline: {new Date(opdracht.deadline).toLocaleDateString('nl-BE')}
           </div>
         )}
 
         {/* Indien Formulier */}
-        <div className="bg-white p-4 rounded-lg space-y-4">
-          <h4 className="font-semibold text-gray-700">Jouw opdracht indienen:</h4>
+        <div className="bg-white/10 backdrop-blur rounded-xl p-4 space-y-4">
+          <h4 className="font-semibold text-white">Jouw opdracht indienen:</h4>
           
           {/* Optie 1: URL */}
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Optie 1: Google Sheet URL
             </label>
             <input
@@ -216,26 +216,26 @@ export default function OpdrachtComponent({
               value={sheetUrl}
               onChange={(e) => setSheetUrl(e.target.value)}
               placeholder="https://docs.google.com/spreadsheets/d/..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-brand-orange focus:border-transparent"
               disabled={loading}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-400 mt-1">
               Zorg dat de sheet publiek is: Delen → Iedereen met de link kan bekijken
             </p>
           </div>
 
-          <div className="flex items-center gap-4 text-gray-400 text-sm">
-            <div className="flex-1 border-t border-gray-200"></div>
+          <div className="flex items-center gap-4 text-gray-500 text-sm">
+            <div className="flex-1 border-t border-white/10"></div>
             <span>OF</span>
-            <div className="flex-1 border-t border-gray-200"></div>
+            <div className="flex-1 border-t border-white/10"></div>
           </div>
 
           {/* Optie 2: Screenshots */}
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Optie 2: Upload screenshots (max 5)
             </label>
-            <p className="text-xs text-gray-500 mb-2">
+            <p className="text-xs text-gray-400 mb-2">
               Maak screenshots van elk tabblad (Data, Draaitabel 1, Draaitabel 2, etc.)
             </p>
             
@@ -252,7 +252,7 @@ export default function OpdrachtComponent({
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={loading || screenshots.length >= 5}
-              className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-white/30 rounded-lg hover:border-brand-orange hover:bg-white/10 transition disabled:opacity-50 text-white"
             >
               <Upload className="w-5 h-5" />
               <span>Klik om te uploaden</span>
@@ -266,7 +266,7 @@ export default function OpdrachtComponent({
                     <img
                       src={src}
                       alt={`Screenshot ${index + 1}`}
-                      className="w-24 h-24 object-cover rounded-lg border"
+                      className="w-24 h-24 object-cover rounded-lg border border-white/20"
                     />
                     <button
                       onClick={() => removeScreenshot(index)}
@@ -279,7 +279,7 @@ export default function OpdrachtComponent({
               </div>
             )}
             
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-400 mt-2">
               {screenshots.length}/5 screenshots geüpload
             </p>
           </div>
@@ -287,7 +287,7 @@ export default function OpdrachtComponent({
           <button
             onClick={handleSubmit}
             disabled={loading || (!sheetUrl && screenshots.length === 0)}
-            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full px-6 py-3 bg-brand-red text-white rounded-lg hover:bg-brand-red/90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
@@ -305,35 +305,35 @@ export default function OpdrachtComponent({
 
         {/* Resultaat */}
         {result && (
-          <div className={`p-4 rounded-lg ${
+          <div className={`p-4 rounded-xl ${
             result.status === 'voltooid' 
-              ? 'bg-green-100 border border-green-300' 
-              : 'bg-red-100 border border-red-300'
+              ? 'bg-green-500/20 border border-brand-green' 
+              : 'bg-red-500/20 border border-red-400'
           }`}>
             {result.status === 'voltooid' && result.score !== undefined && (
               <>
-                <div className="text-3xl font-bold text-green-700 mb-2">
+                <div className="text-3xl font-bold text-brand-orange mb-2">
                   Score: {result.score}/{opdracht.maxScore}
                 </div>
                 
                 {/* Scores per criterium */}
                 {result.details && typeof result.details === 'object' && Object.keys(result.details).length > 0 && (
-                  <div className="bg-white p-4 rounded-lg mb-4">
-                    <h4 className="font-semibold text-gray-700 mb-3">Scores per criterium:</h4>
+                  <div className="bg-white/10 rounded-lg p-4 mb-4">
+                    <h4 className="font-semibold text-white mb-3">Scores per criterium:</h4>
                     <div className="space-y-2">
                       {Object.entries(result.details).map(([criterium, score]) => {
                         const numScore = typeof score === 'number' ? score : 0;
                         return (
                           <div key={criterium} className="flex justify-between items-center">
-                            <span className="text-gray-600">{criterium}</span>
+                            <span className="text-gray-300">{criterium}</span>
                             <div className="flex items-center gap-2">
-                              <div className="w-32 bg-gray-200 rounded-full h-2">
+                              <div className="w-32 bg-white/20 rounded-full h-2">
                                 <div 
-                                  className="bg-green-500 h-2 rounded-full" 
+                                  className="bg-brand-orange h-2 rounded-full" 
                                   style={{ width: `${numScore * 10}%` }}
                                 />
                               </div>
-                              <span className="font-medium text-gray-700 w-12 text-right">{numScore}/10</span>
+                              <span className="font-medium text-white w-12 text-right">{numScore}/10</span>
                             </div>
                           </div>
                         );
@@ -342,7 +342,7 @@ export default function OpdrachtComponent({
                   </div>
                 )}
                 
-                <div className="text-gray-700">
+                <div className="text-white">
                   <strong>Feedback:</strong>
                   <p className="mt-1 whitespace-pre-wrap">
                     {typeof result.feedback === 'string' 
@@ -353,7 +353,7 @@ export default function OpdrachtComponent({
               </>
             )}
             {result.status === 'mislukt' && (
-              <div className="text-red-700">
+              <div className="text-red-300">
                 ❌ {result.feedback}
               </div>
             )}

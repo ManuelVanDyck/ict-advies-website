@@ -1,17 +1,19 @@
 import Link from 'next/link';
-import { Monitor, Mail, Lightbulb } from 'lucide-react';
+import { Monitor, Mail, Lightbulb, Sparkles, Shield } from 'lucide-react';
 
 interface CardProps {
   title: string;
   description: string;
   href: string;
-  icon: 'monitor' | 'mail' | 'lightbulb';
+  icon: 'monitor' | 'mail' | 'lightbulb' | 'sparkles' | 'shield';
 }
 
 const icons = {
   monitor: Monitor,
   mail: Mail,
   lightbulb: Lightbulb,
+  sparkles: Sparkles,
+  shield: Shield,
 };
 
 export default function Card({ title, description, href, icon }: CardProps) {

@@ -1,6 +1,6 @@
 import { client } from '@/sanity/client';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 import CustomPortableText from '@/components/PortableText';
 import OpdrachtComponent from '@/components/OpdrachtComponent';
 
@@ -39,11 +39,15 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
 
   if (!tutorial) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <h1 className="text-2xl font-bold">Tutorial niet gevonden</h1>
-        <Link href="/tutorials" className="text-brand-red hover:underline mt-4 inline-block">
-          ← Terug naar alle tutorials
-        </Link>
+      <div className="min-h-screen bg-gray-50 py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl p-8 shadow-sm">
+            <h1 className="text-2xl font-bold mb-4">Tutorial niet gevonden</h1>
+            <Link href="/tutorials" className="text-brand-red hover:text-red-700 font-medium">
+              ← Terug naar alle tutorials
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -51,46 +55,87 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
   const hasOpdracht = tutorial.opdracht?.ingeschakeld && tutorial.opdracht?.titel;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2 flex-wrap">
-        <Link href="/" className="hover:text-brand-red transition">Home</Link>
-        <span>/</span>
-        <Link href="/tutorials" className="hover:text-brand-red transition">Tutorials</Link>
-        {tutorial.category && (
-          <>
-            <span>/</span>
-            <Link 
-              href={`/tutorials?categorie=${tutorial.category.slug.current}`} 
-              className="hover:text-brand-red transition"
-            >
-              {tutorial.category.title}
-            </Link>
-          </>
-        )}
-        <span>/</span>
-        <span className="text-gray-800">{tutorial.title}</span>
-      </nav>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <section className="py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-8 md:p-12 overflow-hidden shadow-xl">
+            <div className="relative">
+              {/* Breadcrumb */}
+              <nav className="text-sm text-gray-400 mb-6 flex items-center gap-2 flex-wrap">
+                <Link href="/" className="hover:text-white transition">Home</Link>
+                <span>/</span>
+                <Link href="/tutorials" className="hover:text-white transition">Tutorials</Link>
+                {tutorial.category && (
+                  <>
+                    <span>/</span>
+                    <Link 
+                      href={`/tutorials?categorie=${tutorial.category.slug.current}`} 
+                      className="hover:text-white transition"
+                    >
+                      {tutorial.category.title}
+                    </Link>
+                  </>
+                )}
+              </nav>
 
-      <Link href="/tutorials" className="inline-flex items-center gap-2 text-gray-600 hover:text-brand-red mb-6">
-        <ArrowLeft className="w-4 h-4" />
-        <span>Alle tutorials</span>
-      </Link>
-      
-      <h1 className="text-3xl font-bold mb-2">{tutorial.title}</h1>
-      <p className="text-gray-600 mb-8">{tutorial.excerpt}</p>
+              <Link href="/tutorials" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition">
+                <ArrowLeft className="w-4 h-4" />
+                <span>Alle tutorials</span>
+              </Link>
+              
+              {tutorial.category && (
+                <div className="inline-flex items-center gap-2 bg-brand-red/90 text-white px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+                  <BookOpen className="w-4 h-4" />
+                  {tutorial.category.title}
+                </div>
+              )}
+              
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{tutorial.title}</h1>
+              {tutorial.excerpt && (
+                <p className="text-gray-300 text-lg">{tutorial.excerpt}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div className="prose prose-lg max-w-none">
-        {tutorial.body && <CustomPortableText value={tutorial.body} />}
-      </div>
+      {/* Content sectie - wit */}
+      <section className="py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm">
+            <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-brand-red prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700">
+              {tutorial.body && <CustomPortableText value={tutorial.body} />}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Opdracht sectie */}
       {hasOpdracht && (
-        <OpdrachtComponent
-          opdracht={tutorial.opdracht}
-          tutorialId={tutorial._id}
-          tutorialSlug={slug}
-        />
+        <section className="py-8 px-4">
+          <div className="max-w-4xl mx-auto">
+            <OpdrachtComponent
+              opdracht={tutorial.opdracht}
+              tutorialId={tutorial._id}
+              tutorialSlug={slug}
+            />
+          </div>
+        </section>
       )}
+
+      {/* Footer navigatie */}
+      <section className="py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Link 
+            href="/tutorials" 
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-brand-red font-medium transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Terug naar alle tutorials</span>
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

@@ -57,5 +57,6 @@ export default defineType({
     { type: 'image' },
     { type: 'youtube' },
     { type: 'videoFile' },
+    { type: 'twoColumn' },
   ],
 });

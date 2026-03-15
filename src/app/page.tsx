@@ -1,127 +1,214 @@
-import Card from '@/components/Card';
-import { MonitorPlay, GraduationCap, Share2, FolderOpen, BookOpen } from 'lucide-react';
-import Image from 'next/image';
+import { MonitorPlay, GraduationCap, FolderOpen, BookOpen, Mail, Lightbulb, Wrench, BarChart3, Users, Video, FileText, Presentation, Sparkles, ArrowRight, Shield } from 'lucide-react';
+import FeatureCard from '@/components/FeatureCard';
+import { client } from '@/sanity/client';
 
-export default function Home() {
+// Map categorie naar icoon
+const categoryIcons: Record<string, typeof MonitorPlay> = {
+  'clevertouch': MonitorPlay,
+  'google-workspace': Mail,
+  'edutools': Lightbulb,
+  'google-classroom': GraduationCap,
+  'google-drive': FolderOpen,
+  'google-sheets': BarChart3,
+  'google-docs': FileText,
+  'google-slides': Presentation,
+  'google-meet': Video,
+  'canva': Sparkles,
+  'kahoot': Users,
+  'quizlet': BookOpen,
+  'ai-tools': Sparkles,
+  'mediawijs': Shield,
+  'default': Wrench,
+};
+
+interface FeaturedTutorial {
+  title: string;
+  slug: { current: string };
+  excerpt?: string;
+  category?: { title: string; slug: { current: string } };
+}
+
+async function getFeaturedTutorials(): Promise<FeaturedTutorial[]> {
+  const tutorials = await client.fetch<FeaturedTutorial[]>(`
+    *[_type == "tutorial" 
+      && featured == true 
+      && (status == "published" || !defined(status))
+      && isSubtutorial != true
+    ]{
+      title,
+      slug,
+      excerpt,
+      category->{ title, slug }
+    } | order(title asc)
+  `);
+  return tutorials;
+}
+
+export default async function Home() {
+  const featuredTutorials = await getFeaturedTutorials();
+
   return (
-    <div className="min-h-screen bg-brand-cream">
-      {/* Hero Banner */}
-      <section className="w-full bg-brand-cream py-4">
-        <div className="max-w-5xl mx-auto px-4">
-          <Image 
-            src="/banner.png" 
-            alt="ICT-Advies voor leerkrachten" 
-            width={1009}
-            height={299}
-            className="w-full h-auto rounded-lg shadow-md"
-            priority
-            unoptimized
-          />
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section - Dark Gradient */}
+      <section className="py-12 px-4 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-8 md:p-12 overflow-hidden shadow-xl">
+            {/* Subtle pattern overlay */}
+            <div className="absolute inset-0 opacity-5">
+              <div className="absolute inset-0" style={{
+                backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+                backgroundSize: '40px 40px'
+              }}></div>
+            </div>
+            
+            <div className="relative">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-brand-red/90 text-white px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+                <Sparkles className="w-4 h-4" />
+                ICT-ADVIES
+              </div>
+              
+              {/* Headline */}
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 max-w-3xl leading-tight">
+                Optimaliseer je digitale klaslokaal
+              </h1>
+              
+              {/* Subtext */}
+              <p className="text-gray-300 text-base md:text-lg mb-8 max-w-2xl leading-relaxed">
+                Praktische handleidingen en tips voor Clevertouch, Google Workspace, 
+                AI tools en meer — speciaal voor leerkrachten.
+              </p>
+              
+              {/* CTA Buttons */}
+              <div className="flex flex-wrap gap-4">
+                <a 
+                  href="/tutorials" 
+                  className="inline-flex items-center gap-2 bg-brand-red text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                >
+                  Start hier
+                  <ArrowRight className="w-5 h-5" />
+                </a>
+                <a 
+                  href="#aanraders" 
+                  className="inline-flex items-center gap-2 bg-white/10 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 border border-white/20"
+                >
+                  Bekijk aanraders
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Cards Section */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card
-              icon="monitor"
-              title="Clevertouch Impact Plus"
-              description="Handleidingen voor het digibord: basisgebruik, tips en veelvoorkomende problemen oplossen."
+      {/* Feature Cards Section */}
+      <section className="py-12 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FeatureCard
+              icon={MonitorPlay}
+              title="Clevertouch"
+              description="Handleidingen voor het Clevertouch Impact Plus digibord in je klaslokaal."
               href="/tutorials?categorie=clevertouch"
+              color="red"
             />
-            <Card
-              icon="mail"
+            <FeatureCard
+              icon={Mail}
               title="Google Workspace"
-              description="Classroom, Drive, Docs, Sheets en meer. Alles wat je nodig hebt als leerkracht."
+              description="Alle Google tools voor onderwijs: Classroom, Drive, Docs, Sheets en meer."
               href="/tutorials?categorie=google-workspace"
+              color="green"
             />
-            <Card
-              icon="lightbulb"
-              title="EduTools"
-              description="Handige educatieve tools: Canva, Quizlet, Kahoot en meer."
-              href="/tutorials?categorie=edutools"
+            <FeatureCard
+              icon={Sparkles}
+              title="AI Tools"
+              description="Gebruik AI om je lesvoorbereidingen te versnellen en te verbeteren."
+              href="/tutorials?categorie=ai-tools"
+              color="cream"
             />
           </div>
         </div>
       </section>
 
-      {/* Quick Links */}
-      <section className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8 text-brand-red">Populaire Handleidingen</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <a href="/tutorials/clevertouch-basisgebruik" className="group flex items-center gap-4 p-5 bg-brand-cream rounded-xl hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-brand-orange">
-              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                <MonitorPlay className="w-6 h-6 text-brand-green" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800 group-hover:text-brand-red transition-colors">Clevertouch Basisgebruik</h3>
-                <p className="text-sm text-gray-500">Start hier als beginner</p>
-              </div>
-            </a>
-            
-            <a href="/tutorials/google-classroom-basis" className="group flex items-center gap-4 p-5 bg-brand-cream rounded-xl hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-brand-orange">
-              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                <GraduationCap className="w-6 h-6 text-brand-green" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800 group-hover:text-brand-red transition-colors">Google Classroom</h3>
-                <p className="text-sm text-gray-500">Opdrachten en lessen beheren</p>
-              </div>
-            </a>
-            
-            <a href="/tutorials/scherm-delen" className="group flex items-center gap-4 p-5 bg-brand-cream rounded-xl hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-brand-orange">
-              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                <Share2 className="w-6 h-6 text-brand-green" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800 group-hover:text-brand-red transition-colors">Scherm Delen</h3>
-                <p className="text-sm text-gray-500">Je scherm delen met leerlingen</p>
-              </div>
-            </a>
-            
-            <a href="/tutorials/google-drive-organiseren" className="group flex items-center gap-4 p-5 bg-brand-cream rounded-xl hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-brand-orange">
-              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                <FolderOpen className="w-6 h-6 text-brand-green" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800 group-hover:text-brand-red transition-colors">Google Drive</h3>
-                <p className="text-sm text-gray-500">Bestanden organiseren en delen</p>
-              </div>
+      {/* All Categories Grid */}
+      <section className="py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl font-bold mb-8 text-gray-800">Alle categorieën</h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {[
+              { icon: MonitorPlay, title: 'Clevertouch', slug: 'clevertouch', color: 'text-brand-red' },
+              { icon: Mail, title: 'Google Workspace', slug: 'google-workspace', color: 'text-brand-green' },
+              { icon: Lightbulb, title: 'EduTools', slug: 'edutools', color: 'text-brand-orange' },
+              { icon: Sparkles, title: 'AI Tools', slug: 'ai-tools', color: 'text-brand-red' },
+              { icon: Shield, title: 'Mediawijs', slug: 'mediawijs', color: 'text-brand-green' },
+            ].map((cat) => {
+              const IconComponent = cat.icon;
+              return (
+                <a
+                  key={cat.slug}
+                  href={`/tutorials?categorie=${cat.slug}`}
+                  className="group flex flex-col items-center gap-3 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 hover:border-gray-200"
+                >
+                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center group-hover:bg-brand-cream transition-colors">
+                    <IconComponent className={`w-6 h-6 ${cat.color}`} />
+                  </div>
+                  <span className="font-medium text-gray-700 text-center text-sm">{cat.title}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Tutorials */}
+      <section id="aanraders" className="py-16 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold text-gray-800">Aanraders</h2>
+            <a 
+              href="/tutorials" 
+              className="text-brand-red hover:text-red-700 font-medium flex items-center gap-1 transition-colors"
+            >
+              Bekijk alles
+              <ArrowRight className="w-4 h-4" />
             </a>
           </div>
           
-          {/* View all tutorials button */}
-          <div className="mt-10 text-center">
-            <a 
-              href="/tutorials" 
-              className="inline-flex items-center gap-2 bg-brand-red text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-red/90 transition"
-            >
-              <BookOpen className="w-5 h-5" />
-              Bekijk alle tutorials
-            </a>
-          </div>
+          {featuredTutorials.length === 0 ? (
+            <p className="text-gray-500">Geen uitgelichte handleidingen beschikbaar.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {featuredTutorials.map((tutorial) => {
+                const categorySlug = tutorial.category?.slug?.current || 'default';
+                const IconComponent = categoryIcons[categorySlug] || categoryIcons.default;
+                
+                return (
+                  <a 
+                    key={tutorial.slug.current}
+                    href={`/tutorials/${tutorial.slug.current}`} 
+                    className="group p-5 bg-gray-50 rounded-xl hover:bg-brand-cream transition-all duration-300 border border-gray-100 hover:border-brand-orange"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow flex-shrink-0">
+                        <IconComponent className="w-5 h-5 text-brand-green" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-800 group-hover:text-brand-red transition-colors mb-1">
+                          {tutorial.title}
+                        </h3>
+                        {tutorial.excerpt && (
+                          <p className="text-sm text-gray-500 line-clamp-2">{tutorial.excerpt}</p>
+                        )}
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Help Section */}
-      <section className="py-16 bg-brand-cream">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Hulp nodig?</h2>
-            <p className="text-gray-600 mb-6">
-              Neem contact op met de ICT-coördinator voor vragen of ondersteuning.
-            </p>
-            <a 
-              href="mailto:ict@atheneumgentbrugge.be" 
-              className="inline-flex items-center gap-2 bg-brand-green text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-green/90 transition"
-            >
-              Contacteer ICT-Advies
-            </a>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

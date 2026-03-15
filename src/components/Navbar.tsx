@@ -8,7 +8,7 @@ export default function Navbar() {
   const { data: session, status } = useSession();
 
   return (
-    <nav className="bg-brand-cream shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="font-bold text-xl flex items-center gap-3 group">
@@ -23,7 +23,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-1">
             <Link 
               href="/tutorials" 
-              className="text-gray-600 hover:text-brand-red hover:bg-white px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-2"
+              className="text-gray-600 hover:text-brand-red hover:bg-gray-50 px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-2"
             >
               <BookOpen className="w-4 h-4" />
               Tutorials
@@ -31,7 +31,7 @@ export default function Navbar() {
             
             <Link 
               href="/leerpaden" 
-              className="text-gray-600 hover:text-brand-red hover:bg-white px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-2"
+              className="text-gray-600 hover:text-brand-red hover:bg-gray-50 px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-2"
             >
               <GraduationCap className="w-4 h-4" />
               Professionalisering
@@ -41,7 +41,7 @@ export default function Navbar() {
             {status === "authenticated" && (
               <button 
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="ml-2 pl-2 border-l border-gray-300 text-gray-600 hover:text-brand-red hover:bg-white px-3 py-2 rounded-lg transition-all font-medium flex items-center gap-2"
+                className="ml-2 pl-2 border-l border-gray-300 text-gray-600 hover:text-brand-red hover:bg-gray-50 px-3 py-2 rounded-lg transition-all font-medium flex items-center gap-2"
               >
                 <LogOut className="w-4 h-4" />
               </button>

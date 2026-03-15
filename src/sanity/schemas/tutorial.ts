@@ -28,6 +28,13 @@ export default defineType({
       description: 'Vink aan om deze tutorial te verbergen uit de lijst. De tutorial blijft bereikbaar via de link in de hoofd-tutorial.',
     }),
     defineField({
+      name: 'featured',
+      title: 'Uitlichten op startpagina',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Vink aan om deze tutorial te tonen in "Populaire Handleidingen" op de startpagina.',
+    }),
+    defineField({
       name: 'title',
       title: 'Titel',
       type: 'string',
@@ -81,6 +88,10 @@ export default defineType({
         },
         {
           type: 'videoFile',
+        },
+        {
+          type: 'twoColumn',
+          title: 'Twee Kolommen',
         },
       ],
     }),
