@@ -170,8 +170,13 @@ ${sheetContent}
 \`\`\`
 
 Beoordeel op basis van deze DAADWERKELIJKE data. Wees SPECIFIEK over wat je ziet!`
-    : `⚠️ Ik kon de sheet NIET lezen (waarschijnlijk niet publiek gemaakt).`
-    : `⚠️ Ik kon de sheet NIET lezen (waarschijnlijk niet publiek gemaakt).`;
+    : `⚠️ Ik kon de sheet NIET lezen (waarschijnlijk niet publiek gemaakt).
+
+Geef de cursist aan dat:
+- De sheet niet publiek toegankelijk was
+- Je daarom geen specifieke feedback kunt geven
+- Ze de sheet publiek moeten maken en opnieuw indienen voor betere feedback
+- Geef voorlopig een voorzichtige score (60-70)`;
 
   // If we have a PDF, include a note about it
   const pdfSection = pdfUrl
@@ -184,12 +189,6 @@ ${pdfUrl}
 
 De PDF opent automatisch in een nieuw tabblad. Beoordeel op basis van deze INGEVOUDEN PDF.`
     : '';
-
-  Geef de cursist aan dat:
-- De sheet niet publiek toegankelijk was
-- Je daarom geen specifieke feedback kunt geven
-- Ze de sheet publiek moeten maken en opnieuw indienen voor betere feedback
-- Geef voorlopig een voorzichtige score (60-70)`;
 
   return `Je bent een ervaren trainer die opdrachten beoordeelt voor volwassen cursisten (leerkrachten). Je geeft CONCRETE feedback op basis van ALLEEN de criteria hieronder.
 
