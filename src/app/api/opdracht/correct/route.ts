@@ -444,7 +444,7 @@ async function correctWithAI(
 
 // Z.ai fallback - with 60 second timeout
 async function correctWithZai(
-  sheetUrl: string,
+  sheetUrl: string | undefined,
   pdfUrl: string | undefined,
   criteria: Criterium[],
   maxScore: number,
