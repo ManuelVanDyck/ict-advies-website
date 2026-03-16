@@ -524,7 +524,7 @@ async function correctWithZai(
 export async function POST(request: NextRequest) {
   try {
     const body: CorrectionRequest = await request.json();
-    const { inzendingId, sheetUrl, criteria, maxScore, screenshots } = body;
+    const { inzendingId, sheetUrl, pdfUrl, criteria, maxScore, screenshots } = body;
 
     console.log('[Correctie] Request ontvangen:', { 
       inzendingId, 
