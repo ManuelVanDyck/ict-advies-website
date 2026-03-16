@@ -389,7 +389,7 @@ async function correctWithAI(
   if (screenshots && screenshots.length > 0) {
     return correctWithScreenshots(screenshots, criteria, maxScore);
   }
-  const prompt = buildPrompt(criteria, maxScore, sheetUrl, sheetContent);
+  const prompt = buildPrompt(criteria, maxScore, sheetUrl, pdfUrl, sheetContent);
 
   // Try Ollama first (local, free) - with 90 second timeout
   try {
@@ -438,13 +438,14 @@ async function correctWithAI(
     console.error('[Correctie] Ollama error:', ollamaError);
     
     // Fallback to Z.ai
-    return correctWithZai(sheetUrl, criteria, maxScore, sheetContent);
+    return correctWithZai(sheetUrl, pdfUrl, criteria, maxScore, sheetContent);
   }
 }
 
 // Z.ai fallback - with 60 second timeout
 async function correctWithZai(
   sheetUrl: string,
+  pdfUrl: string | undefined,
   criteria: Criterium[],
   maxScore: number,
   sheetContent: string | null
@@ -457,7 +458,7 @@ async function correctWithZai(
 
   console.log('[Correctie] Z.ai fallback starten...');
 
-  const prompt = buildPrompt(criteria, maxScore, sheetUrl, sheetContent);
+  const prompt = buildPrompt(criteria, maxScore, sheetUrl, pdfUrl, sheetContent);
 
   const response = await fetchWithTimeout('https://api.z.ai/api/paas/v4/chat/completions', {
     method: 'POST',
