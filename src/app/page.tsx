@@ -105,10 +105,10 @@ export default async function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FeatureCard
-              icon={MonitorPlay}
-              title="Clevertouch"
-              description="Handleidingen voor het Clevertouch Impact Plus digibord in je klaslokaal."
-              href="/tutorials?categorie=clevertouch"
+              icon={GraduationCap}
+              title="Google - Online trainingen"
+              description="Kosteloze online trainingen van Google voor docenten over digitale vaardigheden."
+              href="/tutorials/google-online-trainingen"
               color="red"
             />
             <FeatureCard
@@ -137,6 +137,7 @@ export default async function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {[
               { icon: MonitorPlay, title: 'Clevertouch', slug: 'clevertouch', color: 'text-brand-red' },
+              { icon: GraduationCap, title: 'Google - Online trainingen', slug: 'google-online-trainingen', color: 'text-brand-red' },
               { icon: Mail, title: 'Google Workspace', slug: 'google-workspace', color: 'text-brand-green' },
               { icon: Lightbulb, title: 'EduTools', slug: 'edutools', color: 'text-brand-orange' },
               { icon: Sparkles, title: 'AI Tools', slug: 'ai-tools', color: 'text-brand-red' },
