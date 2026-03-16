@@ -100,10 +100,11 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Feature Cards Section */}
+      {/* Feature Cards Section - Alle Categorieën */}
       <section className="py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Rij 1 */}
             <FeatureCard
               icon={GraduationCap}
               title="Google - Online trainingen"
@@ -125,38 +126,28 @@ export default async function Home() {
               href="/tutorials?categorie=ai-tools"
               color="cream"
             />
-          </div>
-        </div>
-      </section>
-
-      {/* All Categories Grid */}
-      <section className="py-8 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-gray-800">Alle categorieën</h2>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {[
-              { icon: MonitorPlay, title: 'Clevertouch', slug: 'clevertouch', color: 'text-brand-red' },
-              { icon: GraduationCap, title: 'Google - Online trainingen', slug: 'google-online-trainingen', color: 'text-brand-red' },
-              { icon: Mail, title: 'Google Workspace', slug: 'google-workspace', color: 'text-brand-green' },
-              { icon: Lightbulb, title: 'EduTools', slug: 'edutools', color: 'text-brand-orange' },
-              { icon: Sparkles, title: 'AI Tools', slug: 'ai-tools', color: 'text-brand-red' },
-              { icon: Shield, title: 'Mediawijs', slug: 'mediawijs', color: 'text-brand-green' },
-            ].map((cat) => {
-              const IconComponent = cat.icon;
-              return (
-                <a
-                  key={cat.slug}
-                  href={`/tutorials?categorie=${cat.slug}`}
-                  className="group flex flex-col items-center gap-3 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 hover:border-gray-200"
-                >
-                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center group-hover:bg-brand-cream transition-colors">
-                    <IconComponent className={`w-6 h-6 ${cat.color}`} />
-                  </div>
-                  <span className="font-medium text-gray-700 text-center text-sm">{cat.title}</span>
-                </a>
-              );
-            })}
+            {/* Rij 2 */}
+            <FeatureCard
+              icon={MonitorPlay}
+              title="Clevertouch"
+              description="Handleidingen voor Clevertouch digitale borden in de klas."
+              href="/tutorials?categorie=clevertouch"
+              color="cream"
+            />
+            <FeatureCard
+              icon={Lightbulb}
+              title="EduTools"
+              description="Handige educatieve tools voor je lessen: Kahoot, Quizlet, Canva en meer."
+              href="/tutorials?categorie=edutools"
+              color="orange"
+            />
+            <FeatureCard
+              icon={Shield}
+              title="Mediawijs"
+              description="Digitale geletterdheid en veilig internetgebruik voor leerlingen."
+              href="/tutorials?categorie=mediawijs"
+              color="red"
+            />
           </div>
         </div>
       </section>

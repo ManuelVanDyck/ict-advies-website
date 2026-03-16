@@ -11,7 +11,8 @@ interface Criterium {
 
 interface CorrectionRequest {
   inzendingId: string;
-  sheetUrl: string;
+  sheetUrl?: string;
+  pdfUrl?: string;
   criteria: Criterium[];
   maxScore: number;
   screenshots?: string[]; // Base64 encoded images
@@ -155,13 +156,13 @@ function formatCsvContent(csv: string): string {
 }
 
 // Build the improved prompt
-function buildPrompt(criteria: Criterium[], maxScore: number, sheetUrl: string, sheetContent: string | null): string {
+function buildPrompt(criteria: Criterium[], maxScore: number, sheetUrl: string | undefined, pdfUrl: string | undefined, sheetContent: string | null): string {
   const criteriaText = criteria
     .map((c, i) => `${i + 1}. ${c.naam} (gewicht: ${c.gewicht})${c.beschrijving ? ` - ${c.beschrijving}` : ''}`)
     .join('\n');
 
   // If we have sheet content, include it in the prompt
-  const sheetSection = sheetContent 
+  const sheetSection = sheetContent
     ? `HIER IS DE INHOUD VAN DE GOOGLE SHEET (gebruik dit voor je beoordeling):
 
 \`\`\`
@@ -169,15 +170,32 @@ ${sheetContent}
 \`\`\`
 
 Beoordeel op basis van deze DAADWERKELIJKE data. Wees SPECIFIEK over wat je ziet!`
-    : `⚠️ Ik kon de sheet NIET lezen (waarschijnlijk niet publiek gemaakt).
+    : `⚠️ Ik kon de sheet NIET lezen (waarschijnlijk niet publiek gemaakt).`
+    : `⚠️ Ik kon de sheet NIET lezen (waarschijnlijk niet publiek gemaakt).`;
 
-Geef de cursist aan dat:
+  // If we have a PDF, include a note about it
+  const pdfSection = pdfUrl
+    ? `
+
+DE PDF WORDT DIRECT DOOR DE AI GEANALYSEERD:
+\`\`\`
+${pdfUrl}
+\`\`\`
+
+De PDF opent automatisch in een nieuw tabblad. Beoordeel op basis van deze INGEVOUDEN PDF.`
+    : '';
+
+  Geef de cursist aan dat:
 - De sheet niet publiek toegankelijk was
 - Je daarom geen specifieke feedback kunt geven
 - Ze de sheet publiek moeten maken en opnieuw indienen voor betere feedback
 - Geef voorlopig een voorzichtige score (60-70)`;
 
   return `Je bent een ervaren trainer die opdrachten beoordeelt voor volwassen cursisten (leerkrachten). Je geeft CONCRETE feedback op basis van ALLEEN de criteria hieronder.
+
+${criteriaText}
+
+${sheetSection}${pdfSection}
 
 Een cursist heeft een Google Sheets opdracht ingediend. Beoordeel deze op basis van de volgende criteria:
 
@@ -361,7 +379,8 @@ REGELS:
 
 // Ollama API call for correction (local, free)
 async function correctWithAI(
-  sheetUrl: string,
+  sheetUrl: string | undefined,
+  pdfUrl: string | undefined,
   criteria: Criterium[],
   maxScore: number,
   sheetContent: string | null,
@@ -529,9 +548,9 @@ export async function POST(request: NextRequest) {
 
     // Read sheet content if URL provided
     const sheetContent = sheetUrl ? await readSheetContent(sheetUrl) : null;
-    
+
     // Get AI correction (with screenshots, sheet content, or both)
-    const correction = await correctWithAI(sheetUrl || '', criteria, maxScore, sheetContent, screenshots);
+    const correction = await correctWithAI(sheetUrl, pdfUrl, criteria, maxScore, sheetContent, screenshots);
 
     // Update with results
     const { error: updateError } = await admin

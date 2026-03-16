@@ -80,14 +80,18 @@ export default defineType({
       of: [
         { type: 'block' },
         {
-          type: 'image',
-          options: { hotspot: true },
+          type: 'customImage',
+          title: 'Afbeelding met opties',
         },
         {
           type: 'youtube',
         },
         {
           type: 'videoFile',
+        },
+        {
+          type: 'pdfFile',
+          title: 'PDF Bestand',
         },
         {
           type: 'twoColumn',

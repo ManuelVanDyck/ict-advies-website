@@ -42,6 +42,53 @@ function YouTubeVideo({ value }: { value: { url?: string; caption?: string } }) 
   );
 }
 
+// PDF file component
+function PdfFile({ value }: { value: { file?: any; title?: string; description?: string } }) {
+  if (!value?.file?.asset?._ref) return null;
+  
+  // Extract file URL from Sanity asset reference
+  const assetRef = value.file.asset._ref;
+  const [_file, id, extension] = assetRef.split('-');
+  const fileName = `${id}.${extension}`;
+  const projectId = 'mgu8mw2o'; // Sanity project ID
+  const dataset = 'production';
+  
+  const fileUrl = `https://cdn.sanity.io/files/${projectId}/${dataset}/${fileName}`;
+  
+  return (
+    <div className="mb-8 bg-gray-50 rounded-xl p-6 border border-gray-200">
+      <div className="flex items-start gap-4">
+        <div className="flex-shrink-0">
+          <div className="w-16 h-16 bg-brand-red/10 rounded-lg flex items-center justify-center">
+            <svg className="w-8 h-8 text-brand-red" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            {value.title || 'PDF Document'}
+          </h3>
+          {value.description && (
+            <p className="text-gray-600 text-sm mb-3">{value.description}</p>
+          )}
+          <a
+            href={fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-red text-white rounded-lg hover:bg-brand-red/90 transition font-medium text-sm"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Open PDF in nieuw tabblad
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Text renderer for two-column
 function TextRenderer({ blocks }: { blocks: any[] }) {
   if (!blocks || blocks.length === 0) return null;
@@ -126,8 +173,61 @@ function TwoColumn({ value }: { value: { layout?: string; textColumn?: any[]; im
 const components: PortableTextComponents = {
   types: {
     youtube: YouTubeVideo,
+    pdfFile: PdfFile,
     twoColumn: TwoColumn,
+    customImage: ({ value }) => {
+      if (!value?.image) return null;
+      
+      // Size mapping: width values for different sizes
+      const sizeConfig: Record<string, { width: number; height: number; maxWidth: string; fit?: string }> = {
+        small: { width: 400, height: 300, maxWidth: 'max-w-md' },
+        medium: { width: 600, height: 450, maxWidth: 'max-w-xl' },
+        large: { width: 800, height: 600, maxWidth: 'max-w-3xl' },
+        full: { width: 1200, height: 900, maxWidth: 'max-w-full' },
+        'fit-width': { width: 800, height: 0, maxWidth: 'max-w-3xl', fit: 'max' },
+        'fit-height': { width: 800, height: 0, maxWidth: 'max-w-3xl', fit: 'max' },
+      };
+      
+      const config = sizeConfig[value.size as keyof typeof sizeConfig] || sizeConfig.large;
+      
+      // Build image URL - for fit options, don't set height to prevent cropping
+      let imageUrlBuilder = urlFor(value.image).width(config.width);
+      if (!config.fit) {
+        imageUrlBuilder = imageUrlBuilder.height(config.height);
+      }
+      const imageUrl = imageUrlBuilder.url();
+      
+      // For fit options, use a regular img tag to allow natural height
+      if (config.fit) {
+        return (
+          <div className={`mb-8 ${config.maxWidth} mx-auto`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src={imageUrl} 
+              alt={value.alt || 'Afbeelding'} 
+              className="rounded-lg shadow-md w-full h-auto" 
+            />
+            {value.caption && <p className="text-sm text-gray-500 mt-2 text-center">{value.caption}</p>}
+          </div>
+        );
+      }
+      
+      return (
+        <div className={`mb-8 ${config.maxWidth} mx-auto`}>
+          <Image 
+            src={imageUrl} 
+            alt={value.alt || 'Afbeelding'} 
+            width={config.width} 
+            height={config.height} 
+            className="rounded-lg shadow-md w-full h-auto" 
+            unoptimized 
+          />
+          {value.caption && <p className="text-sm text-gray-500 mt-2 text-center">{value.caption}</p>}
+        </div>
+      );
+    },
     image: ({ value }) => {
+      // Legacy support for old image type
       if (!value) return null;
       const imageUrl = urlFor(value).width(800).height(600).url();
       return (
