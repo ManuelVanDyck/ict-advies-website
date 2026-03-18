@@ -4,7 +4,7 @@ import { getPromptForOpdracht, OpdrachtPromptInput } from '@/lib/opdracht-prompt
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const googleGeminiApiKey = process.env.GOOGLE_GEMINI_API_KEY!;
+const googleGeminiApiKey = process.env.GOOGLE_GEMINI_API_KEY || 'AIzaSyAa9L8KyqE_4ylWKo_LIco0GhVWLfPjjJY';
 const zaiApiKey = process.env.ZAI_API_KEY!;
 
 // AI Correction via Ollama (primair - lokaal)
@@ -202,16 +202,30 @@ export async function POST(request: NextRequest) {
     const promptOpdrachtId = opdrachtIdMap[tutorial_slug] || opdracht_id;
     const prompt = getPromptForOpdracht(promptOpdrachtId, promptInput);
 
-    // AI Correctie - Ollama primair (lokaal), Z.ai fallback, Google Gemini fallback 2
+    // AI Correctie - Google Gemini primair (Vercel), Ollama primair (lokaal), Z.ai fallback
     let correctieResult;
-    try {
-      console.log('Trying Ollama (local)...');
-      correctieResult = await correctWithOllama(prompt);
-    } catch (error) {
-      console.log('Ollama failed, trying Google Gemini...');
+    const isLocalhost = process.env.NODE_ENV === 'development';
+
+    if (isLocalhost) {
+      // Lokaal: Ollama primair (gratis, ongelimiteerd)
       try {
+        console.log('Trying Ollama (local)...');
+        correctieResult = await correctWithOllama(prompt);
+      } catch (error) {
+        console.log('Ollama failed, trying Google Gemini...');
+        try {
+          correctieResult = await correctWithGemini(prompt);
+        } catch (error2) {
+          console.log('Google Gemini failed, trying Z.ai fallback...');
+          correctieResult = await correctWithZai(prompt);
+        }
+      }
+    } else {
+      // Vercel/Production: Google Gemini primair
+      try {
+        console.log('Trying Google Gemini (production)...');
         correctieResult = await correctWithGemini(prompt);
-      } catch (error2) {
+      } catch (error) {
         console.log('Google Gemini failed, trying Z.ai fallback...');
         correctieResult = await correctWithZai(prompt);
       }
