@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import CustomPortableText from '@/components/PortableText';
 import OpdrachtComponent from '@/components/OpdrachtComponent';
+import OpdrachtTekstClient from '@/components/OpdrachtTekstClient';
 
 // Force dynamic rendering in development for instant updates
 export const dynamic = 'force-dynamic';
@@ -24,6 +25,7 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
       excerpt,
       publishedAt,
       body,
+      slug,
       "category": category->{ title, slug },
       opdracht {
         ingeschakeld,
@@ -32,7 +34,8 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
         templateSheetUrl,
         criteria,
         maxScore,
-        deadline
+        deadline,
+        verplicht
       }
     }
   `, { slug });
@@ -115,11 +118,22 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
       {hasOpdracht && (
         <section className="py-8 px-4">
           <div className="max-w-4xl mx-auto">
-            <OpdrachtComponent
-              opdracht={tutorial.opdracht}
-              tutorialId={tutorial._id}
-              tutorialSlug={slug}
-            />
+            {/* AI bewustzijn tutorials (AI Tools categorie + Module titel) gebruiken OpdrachtTekstComponent */}
+            {tutorial.category?.slug?.current === 'ai-tools' && tutorial.title.includes('Module') ? (
+              <OpdrachtTekstClient
+                opdracht={tutorial.opdracht}
+                tutorialId={tutorial._id}
+                tutorialSlug={slug}
+                opdrachtId={slug}
+                tutorialTitle={tutorial.title}
+              />
+            ) : (
+              <OpdrachtComponent
+                opdracht={tutorial.opdracht}
+                tutorialId={tutorial._id}
+                tutorialSlug={slug}
+              />
+            )}
           </div>
         </section>
       )}

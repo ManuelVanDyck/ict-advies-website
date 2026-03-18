@@ -1,0 +1,82 @@
+{
+  "_id": "zFAAjyPeL1qxjAbM7S6oNu",
+  "_type": "tutorial",
+  "title": "Module 2: Betrouwbaarheid Toetsen",
+  "slug": {
+    "_type": "slug",
+    "current": "ai-bewustzijn-module-2"
+  },
+  "category": {
+    "_type": "reference",
+    "_ref": "36b14c4e-2acd-4bf8-a322-98bdef24cfe8"
+  },
+  "status": "published",
+  "featured": false,
+  "isSubtutorial": false,
+  "body": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "text": "Je leert een AI-toepassing kritisch te beoordelen aan de hand van de zeven sleutelvoorwaarden voor betrouwbare AI."
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "text": "Focus"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "text": "Menselijke controle, transparantie (hoe komt de AI tot een antwoord?), privacy (AVG/GDPR), en het voorkomen van discriminatie of 'bias' (vooral bij leerlingen met specifieke behoeften)."
+        }
+      ]
+    }
+  ],
+  "opdracht": {
+    "ingeschakeld": true,
+    "titel": "De Betrouwbaarheidsscan",
+    "instructie": "Maak een analyse van de gekozen tool op basis van de 5 criteria hieronder. Toon aan dat je de technische documentatie en privacyvoorwaarden hebt gelezen, dat je hebt gecontroleerd of de tool toegankelijk is voor al je leerlingen (inclusief die met specifieke onderwijsbehoeften), en dat je kunt uitleggen (transparantie) aan leerlingen hoe de AI tot zijn resultaten komt.",
+    "criteria": [
+      {
+        "naam": "privacy",
+        "beschrijving": "Privacyvoorwaarden en data verwerking geanalyseerd",
+        "gewicht": 20
+      },
+      {
+        "naam": "toegankelijkheid",
+        "beschrijving": "Inclusief voor leerlingen met specifieke onderwijsbehoeften",
+        "gewicht": 20
+      },
+      {
+        "naam": "transparantie",
+        "beschrijving": "Kun je uitleggen hoe de AI werkt aan leerlingen?",
+        "gewicht": 20
+      },
+      {
+        "naam": "discriminatie",
+        "beschrijving": "Bias en discriminatie gecontroleerd",
+        "gewicht": 20
+      },
+      {
+        "naam": "menselijke_controle",
+        "beschrijving": "Blijft de leerkracht de regie houden?",
+        "gewicht": 20
+      }
+    ],
+    "maxScore": 100,
+    "verplicht": true
+  }
+}

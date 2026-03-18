@@ -1,0 +1,65 @@
+{
+  "_type": "tutorial",
+  "title": "Module 1: Visievorming – De Mens aan het Roer",
+  "slug": "ai-bewustzijn-module-1",
+  "category": "AI bewustzijn",
+  "status": "published",
+  "featured": false,
+  "isSubtutorial": false,
+  "body": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "text": "In deze module leer je dat AI-systemen niet volledig zelfstandig werken, maar door mensen gedefinieerde doelstellingen uitvoeren. Verantwoorde AI betekent dat jij als leerkracht verantwoordelijkheid neemt voor de impact van de technologie op je leerlingen."
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "text": "Kernconcept"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "text": "Het leerproces van de lerende staat altijd voorop; AI is een hulpmiddel, geen doel op zich."
+        }
+      ]
+    }
+  ],
+  "opdracht": {
+    "ingeschakeld": true,
+    "titel": "De Verantwoordingsmatrix",
+    "instructie": "Stel een document op voor een specifieke AI-tool die je wilt gebruiken (bijv. een chatbot of oefenplatform). Beschrijf hierin wat het specifieke onderwijsdoel is dat je wilt bereiken, waarom een AI-toepassing hier beter of doeltreffender is dan een niet-digitale werkvorm, en hoe je jouw professionele autonomie waarborgt als de AI een foutief advies geeft.",
+    "criteria": [
+      {
+        "naam": "onderwijsdoel",
+        "beschrijving": "Concreet en meetbaar onderwijsdoel beschrijven",
+        "gewicht": 30
+      },
+      {
+        "naam": "ai_beter",
+        "beschrijving": "Motivatie waarom AI beter is dan traditionele werkvormen",
+        "gewicht": 30
+      },
+      {
+        "naam": "autonomie",
+        "beschrijving": "Hoe blijf je controle en professionele autonomie behouden?",
+        "gewicht": 40
+      }
+    ],
+    "maxScore": 100,
+    "verplicht": true
+  }
+}

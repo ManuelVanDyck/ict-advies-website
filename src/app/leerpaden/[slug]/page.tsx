@@ -1,221 +1,228 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
+import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 import { notFound } from 'next/navigation';
-import { getLeerpadBySlug, getLeerpaden } from '@/sanity/queries';
-import { Clock, CheckCircle, ArrowRight, ArrowLeft, BookOpen, Target, Lightbulb } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowLeft, GraduationCap, CheckCircle2, PlayCircle, BookOpen, Lightbulb } from 'lucide-react';
+import { client } from '@/sanity/client';
 
-// Force dynamic rendering in development for instant updates
-export const dynamic = 'force-dynamic';
+export default async function LeerpadDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const session = await auth();
 
-export async function generateStaticParams() {
-  const leerpaden = await getLeerpaden();
-  return leerpaden.map((leerpad: any) => ({
-    slug: leerpad.slug?.current || '',
-  }));
-}
+  if (!session?.user) {
+    redirect('/login');
+  }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const leerpad = await getLeerpadBySlug(slug);
-  if (!leerpad) return { title: 'Leerpad niet gevonden' };
-  return {
-    title: `${leerpad.titel} | ICT-Advies`,
-    description: leerpad.doelgroep,
-  };
-}
 
-const profielEmojis: Record<string, string> = {
-  starter: '🌱',
-  integrator: '🔍',
-  expert: '🔧',
-  leader: '🚀',
-  'ai-verplicht': '🤖',
-};
-
-const profielNamen: Record<string, string> = {
-  starter: 'Digitale basis (A1→A2)',
-  integrator: 'Digitale integratie (A2→B1)',
-  expert: 'Digitale verdieping (B1→B2)',
-  leader: 'Digitale innovatie (B2+)',
-  'ai-verplicht': 'AI bewustzijn (verplicht)',
-};
-
-export default async function LeerpadDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const leerpad = await getLeerpadBySlug(slug);
+  // Fetch leerpad from Sanity
+  const leerpad = await client.fetch(`
+    *[_type == "leerpad" && slug.current == $slug][0] {
+      _id,
+      title,
+      slug,
+      description,
+      leerdoelstellingen,
+      voorkennis,
+      voorbereiding,
+      modules[]->{
+        _id,
+        title,
+        slug,
+        "category": category->{ title, slug },
+        body,
+        opdracht {
+          ingeschakeld,
+          titel,
+          instructie,
+          criteria,
+          maxScore,
+          deadline,
+          verplicht
+        }
+      }
+    }
+  `, { slug });
 
   if (!leerpad) {
     notFound();
   }
 
-  const leerpadSlug = leerpad.slug?.current || slug;
-
   return (
-    <div className="min-h-screen bg-[#fee4cc]">
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-[#4c8077] to-[#3a6b63] text-white py-12">
-        <div className="container mx-auto px-4">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm opacity-80 mb-4">
-            <Link href="/leerpaden" className="hover:underline">
-              Leerpaden
-            </Link>
-            <span>/</span>
-            <span>{leerpad.titel}</span>
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <section className="py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Link href="/leerpaden" className="text-gray-400 hover:text-white mb-4 inline-flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            <span>Alle leerpaden</span>
+          </Link>
 
-          <div className="flex items-start gap-4">
-            <span className="text-5xl">{profielEmojis[leerpad.profiel] || '📚'}</span>
-            <div>
-              <h1 className="text-4xl font-bold mb-2">{leerpad.titel}</h1>
-              <p className="text-lg opacity-90">{profielNamen[leerpad.profiel] || leerpad.doelgroep}</p>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="flex gap-6 mt-6">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5" />
-              <span>{leerpad.totaleDuur} uur</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5" />
-              <span>{leerpad.modules?.length || 0} modules</span>
-            </div>
-            {leerpad.certificaat && (
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" />
-                <span>Certificaat beschikbaar</span>
+          <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-8 md:p-12 overflow-hidden shadow-xl">
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 bg-brand-red/90 text-white px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+                <GraduationCap className="w-4 h-4" />
+                {leerpad.title || leerpad.slug?.current}
               </div>
-            )}
-          </div>
-        </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Intro */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-semibold text-[#4c8077] mb-4">
-                Over dit leerpad
-              </h2>
-              <p className="text-gray-600 mb-4">{leerpad.doelgroep}</p>
-            </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                {leerpad.title || leerpad.slug?.current}
+              </h1>
 
-            {/* Modules */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-semibold text-[#4c8077] mb-6">
-                Modules
-              </h2>
-              {leerpad.modules && leerpad.modules.length > 0 ? (
-                <div className="space-y-4">
-                  {leerpad.modules.map((module: any, index: number) => {
-                    const moduleSlug = module.slug?.current || `module-${index + 1}`;
-                    return (
-                      <Link
-                        key={module._id || index}
-                        href={`/leerpaden/${leerpadSlug}/${moduleSlug}`}
-                        className="block border-2 border-gray-200 rounded-lg p-4 hover:border-[#e53013] transition-colors group"
-                      >
-                        <div className="flex items-start gap-4">
-                          <div className="bg-[#4c8077] text-white rounded-full w-10 h-10 flex items-center justify-center font-bold shrink-0">
-                            {index + 1}
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-lg group-hover:text-[#e53013] transition-colors">
-                              {module.titel}
-                            </h3>
-                            <p className="text-gray-600 text-sm mt-1">
-                              {module.beschrijving}
-                            </p>
-                            <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
-                              <div className="flex items-center gap-1">
-                                <Clock className="w-4 h-4" />
-                                <span>{module.duur} min</span>
-                              </div>
-                              {module.aiStap && (
-                                <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
-                                  AI Stap {module.aiStap}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#e53013] transition-colors" />
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-gray-500">Nog geen modules beschikbaar.</p>
+              {leerpad.description && (
+                <p className="text-gray-300 text-lg">{leerpad.description}</p>
               )}
             </div>
           </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Start button */}
-            {leerpad.modules && leerpad.modules.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <Link
-                  href={`/leerpaden/${leerpadSlug}/${leerpad.modules[0].slug?.current || 'module-1'}`}
-                  className="block w-full bg-[#e53013] text-white text-center py-3 rounded-lg font-semibold hover:bg-[#c42a10] transition-colors"
-                >
-                  Start leerpad
-                  <ArrowRight className="w-5 h-5 inline ml-2" />
-                </Link>
-              </div>
-            )}
-
-            {/* Doelstellingen */}
-            {leerpad.doelstellingen && leerpad.doelstellingen.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="font-semibold text-[#4c8077] mb-4 flex items-center gap-2">
-                  <Target className="w-5 h-5" />
-                  Wat leer je?
-                </h3>
-                <ul className="space-y-2">
-                  {leerpad.doelstellingen.map((doel: string, index: number) => (
-                    <li key={index} className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                      <span>{doel}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Voorwaarden */}
-            {leerpad.voorwaarden && leerpad.voorwaarden.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="font-semibold text-[#4c8077] mb-4 flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5" />
-                  Voorkennis
-                </h3>
-                <ul className="space-y-2">
-                  {leerpad.voorwaarden.map((voorwaarde: string, index: number) => (
-                    <li key={index} className="flex items-start gap-2 text-sm">
-                      <span className="text-gray-400">•</span>
-                      <span>{voorwaarde}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Back link */}
-            <Link
-              href="/leerpaden"
-              className="flex items-center gap-2 text-[#4c8077] hover:text-[#3a6b63] transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Alle leerpaden</span>
-            </Link>
-          </div>
         </div>
-      </div>
+      </section>
+
+      {/* Content */}
+      <section className="py-8 px-4">
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Leerdoelstellingen */}
+          {leerpad.leerdoelstellingen && leerpad.leerdoelstellingen.length > 0 && (
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <BookOpen className="w-6 h-6 text-brand-red" />
+                Leerdoelstellingen
+              </h2>
+              <ul className="space-y-3">
+                {leerpad.leerdoelstellingen.map((ld: string, idx: number) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">{ld}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Voorkennis */}
+          {leerpad.voorkennis && leerpad.voorkennis.length > 0 && (
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <GraduationCap className="w-6 h-6 text-brand-orange" />
+                Voorkennis
+              </h2>
+              <ul className="space-y-3">
+                {leerpad.voorkennis.map((vk: string, idx: number) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <PlayCircle className="w-5 h-5 text-brand-orange mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">{vk}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Voorbereiding */}
+          {leerpad.voorbereiding && leerpad.voorbereiding.length > 0 && (
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Lightbulb className="w-6 h-6 text-brand-green" />
+                Voorbereiding
+              </h2>
+              <ul className="space-y-4">
+                {leerpad.voorbereiding.map((vb: any, idx: number) => (
+                  <li key={idx} className="flex items-start gap-4">
+                    <Lightbulb className="w-5 h-5 text-brand-green mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-900 mb-1">{vb.titel}</div>
+                      <p className="text-gray-600 mb-2">{vb.beschrijving}</p>
+                      <Link
+                        href={vb.link}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green text-white rounded-lg font-medium hover:bg-green-600 transition-colors"
+                      >
+                        Bekijk tutorials
+                        <ArrowLeft className="w-4 h-4 rotate-180" />
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Modules */}
+          {leerpad.modules && leerpad.modules.length > 0 && (
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <GraduationCap className="w-6 h-6 text-brand-green" />
+                Modules ({leerpad.modules.length})
+              </h2>
+
+              <div className="space-y-6">
+                {leerpad.modules.map((module: any, idx: number) => (
+                  <div
+                    key={module._id}
+                    className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-start gap-4">
+                        <div className="flex items-center justify-center w-10 h-10 bg-brand-red/10 rounded-full">
+                          <span className="font-bold text-brand-red">{idx + 1}</span>
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg text-gray-900 mb-1">
+                            {module.title}
+                          </h3>
+                          {module.category && (
+                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                              {module.category.title}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {module.opdracht?.verplicht && (
+                        <span className="text-xs bg-brand-red text-white px-3 py-1 rounded-full font-medium">
+                          Verplicht
+                        </span>
+                      )}
+                    </div>
+
+                    {module.body && (
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                        {module.body[0]?.children?.[0]?.text}
+                      </p>
+                    )}
+
+                    {module.opdracht?.ingeschakeld && (
+                      <div className="bg-brand-cream rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <CheckCircle2 className="w-5 h-5 text-brand-red" />
+                          <span className="font-semibold text-gray-900">Opdracht</span>
+                        </div>
+                        <p className="text-sm text-gray-700">{module.opdracht.titel}</p>
+                      </div>
+                    )}
+
+                    <Link
+                      href={`/tutorials/${module.slug?.current}`}
+                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand-green text-white rounded-lg font-medium hover:bg-green-600 transition-colors"
+                    >
+                      <PlayCircle className="w-5 h-5" />
+                      Start module
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Mijn Voortgang link */}
+          <Link
+            href="/mijn-voortgang"
+            className="block bg-brand-green hover:bg-green-600 text-white rounded-xl p-6 text-center transition-colors"
+          >
+            <h3 className="text-xl font-bold mb-1">Mijn Voortgang</h3>
+            <p className="text-white/90">Bekijk je voortgang in dit leerpad</p>
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

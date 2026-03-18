@@ -1,0 +1,44 @@
+{
+  "_id": "leerpad-ai",
+  "_type": "leerpad",
+  "title": "AI Bewustzijn",
+  "slug": {
+    "_type": "slug",
+    "current": "ai-bewustzijn"
+  },
+  "description": "Leer verantwoord omgaan met AI in je klaspraktijk. Dit leerpad begeleidt je stap voor stap bij het integreren van verantwoorde artificiële intelligentie.",
+  "leerdoelstellingen": [
+    "Je begrijpt dat AI-systemen door mensen gedefinieerde doelstellingen uitvoeren",
+    "Je kunt een AI-toepassing kritisch beoordelen op basis van de 7 sleutelvoorwaarden",
+    "Je doorloopt het didactische proces voor het selecteren en gebruiken van AI-tools",
+    "Je ontwikkelt een continue professionaliseringsmindset rond AI"
+  ],
+  "voorkennis": [
+    "Basis computer vaardigheden",
+    "Kennis van je eigen klaspraktijk",
+    "Bereidheid om kritisch te reflecteren op technologie gebruik"
+  ],
+  "modules": [
+    {
+      "_type": "reference",
+      "_ref": "AgREUgzyQrbi3DuJKr34E2",
+      "_key": "module-1-visievorming"
+    },
+    {
+      "_type": "reference",
+      "_ref": "zFAAjyPeL1qxjAbM7S6oNu",
+      "_key": "module-2-betrouwbaarheid"
+    },
+    {
+      "_type": "reference",
+      "_ref": "INDY0s1ExqNM7nXhKGWzKa",
+      "_key": "module-3-didactisch"
+    },
+    {
+      "_type": "reference",
+      "_ref": "INDY0s1ExqNM7nXhKGX3Fj",
+      "_key": "module-4-professionalisering"
+    }
+  ],
+  "status": "published"
+}

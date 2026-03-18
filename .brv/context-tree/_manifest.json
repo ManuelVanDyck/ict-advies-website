@@ -1,0 +1,85 @@
+{
+  "active_context": [
+    {
+      "order": 3,
+      "path": "_index.md",
+      "tokens": 613,
+      "type": "summary"
+    },
+    {
+      "order": 2,
+      "path": "architecture/_index.md",
+      "tokens": 586,
+      "type": "summary"
+    },
+    {
+      "order": 2,
+      "path": "branding/_index.md",
+      "tokens": 239,
+      "type": "summary"
+    },
+    {
+      "order": 1,
+      "path": "architecture/ai_correction/_index.md",
+      "tokens": 387,
+      "type": "summary"
+    },
+    {
+      "order": 1,
+      "path": "branding/visual_identity/_index.md",
+      "tokens": 150,
+      "type": "summary"
+    },
+    {
+      "importance": 50,
+      "path": "architecture/ai_correction/assignment_correction_system.md",
+      "tokens": 486,
+      "type": "context"
+    },
+    {
+      "importance": 50,
+      "path": "architecture/context.md",
+      "tokens": 47,
+      "type": "context"
+    },
+    {
+      "importance": 50,
+      "path": "architecture/overview/context.md",
+      "tokens": 23,
+      "type": "context"
+    },
+    {
+      "importance": 50,
+      "path": "architecture/overview/ict_advies_website_stack.md",
+      "tokens": 272,
+      "type": "context"
+    },
+    {
+      "importance": 50,
+      "path": "branding/context.md",
+      "tokens": 32,
+      "type": "context"
+    },
+    {
+      "importance": 50,
+      "path": "branding/visual_identity/brand_colors.md",
+      "tokens": 158,
+      "type": "context"
+    },
+    {
+      "importance": 50,
+      "path": "branding/visual_identity/context.md",
+      "tokens": 22,
+      "type": "context"
+    }
+  ],
+  "generated_at": "2026-03-16T21:43:57.180Z",
+  "lane_tokens": {
+    "contexts": 1040,
+    "stubs": 0,
+    "summaries": 1975
+  },
+  "source_fingerprint": "235401c84b5da9b46e376e550ccbcd4590b51355a1dd598b31b791cd9c97ddc0",
+  "total_tokens": 3015,
+  "version": 1
+}

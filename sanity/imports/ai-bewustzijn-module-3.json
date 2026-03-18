@@ -1,0 +1,65 @@
+{
+  "_type": "tutorial",
+  "title": "Module 3: Het Didactische Proces (6 Stappen)",
+  "slug": "ai-bewustzijn-module-3",
+  "category": "AI bewustzijn",
+  "status": "published",
+  "featured": false,
+  "isSubtutorial": false,
+  "body": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "text": "Je doorloopt de praktische cyclus voor het selecteren en gebruiken van een tool."
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "text": "Stappen"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "text": "Doelen vastleggen, alternatieven afwegen (is AI echt nodig?), ethische kaders toepassen vóór aanschaf/gebruik, samenwerken met belanghebbenden, verantwoordelijkheid delen en regelmatig evalueren."
+        }
+      ]
+    }
+  ],
+  "opdracht": {
+    "ingeschakeld": true,
+    "titel": "Participatieplan",
+    "instructie": "Ontwerp een korte lesactiviteit of overlegmoment waarbij je met leerlingen en/of ouders bespreekt welke impact de AI-toepassing heeft op hun leerproces en privacy, en input verzamelt over mogelijke bezwaren of verrassende effecten van de tool.",
+    "criteria": [
+      {
+        "naam": "betrokkenheid",
+        "beschrijving": "Leerlingen en/of ouders betrokken bij besluitvorming",
+        "gewicht": 30
+      },
+      {
+        "naam": "privacy_impact",
+        "beschrijving": "Privacy-impact expliciet besproken met stakeholders",
+        "gewicht": 30
+      },
+      {
+        "naam": "uitvoering",
+        "beschrijving": "Praktische, uitvoerbare lesactiviteit of overlegmoment",
+        "gewicht": 40
+      }
+    ],
+    "maxScore": 100,
+    "verplicht": true
+  }
+}

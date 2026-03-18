@@ -30,22 +30,22 @@ export default async function TutorialsPage({
   const params = await searchParams;
   const selectedCategory = params.categorie || null;
   
-  // Haal alle categorieën op (count alleen gepubliceerde tutorials, geen subtutorials)
+  // Haal alle categorieën op (count alleen gepubliceerde tutorials, geen subtutorials, GEEN leerpad modules)
   const categories = await client.fetch(`
     *[_type == "category"] | order(title asc) {
       _id,
       title,
       slug,
       description,
-      "count": count(*[_type == "tutorial" && references(^._id) && (status == "published" || !defined(status)) && isSubtutorial != true])
+      "count": count(*[_type == "tutorial" && references(^._id) && (status == "published" || !defined(status)) && isSubtutorial != true && !(title match "Module *")])
     }
   `);
   
-  // Haal tutorials op: published, geen subtutorials
+  // Haal tutorials op: published, geen subtutorials, GEEN leerpad modules
   let tutorials;
   if (selectedCategory) {
     tutorials = await client.fetch(`
-      *[_type == "tutorial" && category->slug.current == $category && (status == "published" || !defined(status)) && isSubtutorial != true] | order(publishedAt desc) {
+      *[_type == "tutorial" && category->slug.current == $category && (status == "published" || !defined(status)) && isSubtutorial != true && !(title match "Module *")] | order(publishedAt desc) {
         _id,
         title,
         slug,
@@ -55,7 +55,7 @@ export default async function TutorialsPage({
     `, { category: selectedCategory });
   } else {
     tutorials = await client.fetch(`
-      *[_type == "tutorial" && (status == "published" || !defined(status)) && isSubtutorial != true] | order(publishedAt desc) {
+      *[_type == "tutorial" && (status == "published" || !defined(status)) && isSubtutorial != true && !(title match "Module *")] | order(publishedAt desc) {
         _id,
         title,
         slug,

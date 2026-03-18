@@ -1,0 +1,1586 @@
+[
+  {
+    "of": [
+      {
+        "marks": {
+          "annotations": [
+            {
+              "i18nTitleKey": "inputs.portable-text.annotation.link",
+              "options": {
+                "modal": {
+                  "type": "popover"
+                }
+              },
+              "fields": [
+                {
+                  "validation": [
+                    {
+                      "rules": [
+                        {
+                          "flag": "uri",
+                          "constraint": {
+                            "options": {
+                              "scheme": [
+                                "/^http$/",
+                                "/^https$/",
+                                "/^tel$/",
+                                "/^mailto$/"
+                              ],
+                              "allowRelative": true,
+                              "relativeOnly": false,
+                              "allowCredentials": false
+                            }
+                          }
+                        }
+                      ],
+                      "level": "error"
+                    }
+                  ],
+                  "description": "A valid web, email, phone, or relative link.",
+                  "name": "href",
+                  "type": "url",
+                  "title": "Link"
+                }
+              ],
+              "name": "link",
+              "type": "object"
+            }
+          ],
+          "decorators": [
+            {
+              "value": "strong",
+              "title": "Strong"
+            },
+            {
+              "value": "em",
+              "title": "Italic"
+            },
+            {
+              "value": "code",
+              "title": "Code"
+            },
+            {
+              "value": "underline",
+              "title": "Underline"
+            },
+            {
+              "value": "strike-through",
+              "title": "Strike"
+            }
+          ]
+        },
+        "lists": [
+          {
+            "value": "bullet",
+            "title": "Bulleted list"
+          },
+          {
+            "value": "number",
+            "title": "Numbered list"
+          }
+        ],
+        "styles": [
+          {
+            "value": "normal",
+            "title": "Normal"
+          },
+          {
+            "value": "h1",
+            "title": "Heading 1"
+          },
+          {
+            "value": "h2",
+            "title": "Heading 2"
+          },
+          {
+            "value": "h3",
+            "title": "Heading 3"
+          },
+          {
+            "value": "h4",
+            "title": "Heading 4"
+          },
+          {
+            "value": "h5",
+            "title": "Heading 5"
+          },
+          {
+            "value": "h6",
+            "title": "Heading 6"
+          },
+          {
+            "value": "blockquote",
+            "title": "Quote"
+          }
+        ],
+        "of": [],
+        "type": "block"
+      },
+      {
+        "type": "customImage",
+        "title": "Afbeelding met opties"
+      },
+      {
+        "type": "youtube",
+        "title": "YouTube Video"
+      },
+      {
+        "type": "videoFile",
+        "title": "Video Bestand"
+      },
+      {
+        "type": "twoColumn",
+        "title": "Twee Kolommen"
+      }
+    ],
+    "name": "blockContent",
+    "type": "array"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "📝 Draft - In bewerking",
+              "value": "draft"
+            },
+            {
+              "title": "👀 Review - Klaar voor controle",
+              "value": "review"
+            },
+            {
+              "title": "✅ Published - Zichtbaar op website",
+              "value": "published"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "draft",
+        "description": "Bepaal of deze tutorial zichtbaar is op de website",
+        "name": "status",
+        "type": "string",
+        "title": "Publicatiestatus"
+      },
+      {
+        "initialValue": false,
+        "description": "Vink aan om deze tutorial te verbergen uit de lijst. De tutorial blijft bereikbaar via de link in de hoofd-tutorial.",
+        "name": "isSubtutorial",
+        "type": "boolean",
+        "title": "Is sub-tutorial"
+      },
+      {
+        "initialValue": false,
+        "description": "Vink aan om deze tutorial te tonen in \"Populaire Handleidingen\" op de startpagina.",
+        "name": "featured",
+        "type": "boolean",
+        "title": "Uitlichten op startpagina"
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "title": "Titel"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "rows": 3,
+        "name": "excerpt",
+        "type": "text",
+        "title": "Samenvatting"
+      },
+      {
+        "to": [
+          {
+            "type": "category"
+          }
+        ],
+        "name": "category",
+        "type": "reference",
+        "title": "Categorie"
+      },
+      {
+        "name": "publishedAt",
+        "type": "datetime",
+        "title": "Publicatiedatum"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "coverImage",
+        "type": "image",
+        "title": "Cover Afbeelding"
+      },
+      {
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "i18nTitleKey": "inputs.portable-text.annotation.link",
+                  "options": {
+                    "modal": {
+                      "type": "popover"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^tel$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": true,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "description": "A valid web, email, phone, or relative link.",
+                      "name": "href",
+                      "type": "url",
+                      "title": "Link"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Italic"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                },
+                {
+                  "value": "underline",
+                  "title": "Underline"
+                },
+                {
+                  "value": "strike-through",
+                  "title": "Strike"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          },
+          {
+            "type": "customImage",
+            "title": "Afbeelding met opties"
+          },
+          {
+            "type": "youtube",
+            "title": "YouTube Video"
+          },
+          {
+            "type": "videoFile",
+            "title": "Video Bestand"
+          },
+          {
+            "type": "twoColumn",
+            "title": "Twee Kolommen"
+          }
+        ],
+        "name": "body",
+        "type": "array",
+        "title": "Inhoud"
+      },
+      {
+        "description": "Optionele opdracht bij deze tutorial",
+        "name": "opdracht",
+        "type": "opdracht"
+      }
+    ],
+    "name": "tutorial",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "title",
+        "type": "string",
+        "title": "Titel"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "title": "Beschrijving"
+      }
+    ],
+    "name": "category",
+    "type": "document",
+    "title": "Categorie"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "📝 Draft - In bewerking",
+              "value": "draft"
+            },
+            {
+              "title": "👀 Review - Klaar voor controle",
+              "value": "review"
+            },
+            {
+              "title": "✅ Published - Zichtbaar op website",
+              "value": "published"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "draft",
+        "description": "Bepaal of dit leerpad zichtbaar is op de website",
+        "name": "status",
+        "type": "string",
+        "title": "Publicatiestatus"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Naam van het leerpad (bv. \"AI Introductie\")",
+        "name": "titel",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "titel",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "🌱 Starter - Digitale basis (A1→A2)",
+              "value": "starter"
+            },
+            {
+              "title": "🔍 Integrator - Digitale integratie (A2→B1)",
+              "value": "integrator"
+            },
+            {
+              "title": "🔧 Expert - Digitale verdieping (B1→B2)",
+              "value": "expert"
+            },
+            {
+              "title": "🚀 Leader - Digitale innovatie (B2+)",
+              "value": "leader"
+            },
+            {
+              "title": "🤖 AI Verplicht - AI bewustzijn (allemaal)",
+              "value": "ai-verplicht"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "starter",
+                  "integrator",
+                  "expert",
+                  "leader",
+                  "ai-verplicht"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "profiel",
+        "type": "string",
+        "title": "Doelgroep Profiel"
+      },
+      {
+        "rows": 2,
+        "description": "Voor wie is dit leerpad bedoeld?",
+        "name": "doelgroep",
+        "type": "text",
+        "title": "Doelgroep Beschrijving"
+      },
+      {
+        "description": "Korte introductie van het leerpad",
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "i18nTitleKey": "inputs.portable-text.annotation.link",
+                  "options": {
+                    "modal": {
+                      "type": "popover"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^tel$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": true,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "description": "A valid web, email, phone, or relative link.",
+                      "name": "href",
+                      "type": "url",
+                      "title": "Link"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Italic"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                },
+                {
+                  "value": "underline",
+                  "title": "Underline"
+                },
+                {
+                  "value": "strike-through",
+                  "title": "Strike"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "beschrijving",
+        "type": "array",
+        "title": "Introductie"
+      },
+      {
+        "description": "Modules in dit leerpad (in volgorde)",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "module"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to module"
+          }
+        ],
+        "name": "modules",
+        "type": "array"
+      },
+      {
+        "description": "Geschatte tijd om het leerpad te voltooien",
+        "name": "totaleDuur",
+        "type": "number",
+        "title": "Totale Duur (uren)"
+      },
+      {
+        "description": "Wat leert de gebruiker in dit leerpad?",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "doelstellingen",
+        "type": "array",
+        "title": "Leerdoelstellingen"
+      },
+      {
+        "description": "Wat moet je al kennen voordat je start?",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "voorwaarden",
+        "type": "array",
+        "title": "Voorkennis"
+      },
+      {
+        "initialValue": false,
+        "description": "Krijgt de gebruiker een certificaat na voltooiing?",
+        "name": "certificaat",
+        "type": "boolean",
+        "title": "Certificaat Beschikbaar"
+      },
+      {
+        "initialValue": false,
+        "description": "Toon dit leerpad prominent op de homepage",
+        "name": "featured",
+        "type": "boolean",
+        "title": "Uitgelicht"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "description": "Optionele afbeelding voor het leerpad",
+        "name": "afbeelding",
+        "type": "image"
+      }
+    ],
+    "name": "leerpad",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "📝 Draft - In bewerking",
+              "value": "draft"
+            },
+            {
+              "title": "👀 Review - Klaar voor controle",
+              "value": "review"
+            },
+            {
+              "title": "✅ Published - Zichtbaar op website",
+              "value": "published"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "draft",
+        "description": "Bepaal of deze module zichtbaar is op de website",
+        "name": "status",
+        "type": "string",
+        "title": "Publicatiestatus"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Naam van de module (bv. \"AI begrijpen\")",
+        "name": "titel",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "titel",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "1. Professionele Engage",
+              "value": "domein1"
+            },
+            {
+              "title": "2. Digitale Bronnen",
+              "value": "domein2"
+            },
+            {
+              "title": "3. Lesgeven & Leren",
+              "value": "domein3"
+            },
+            {
+              "title": "4. Beoordeling",
+              "value": "domein4"
+            },
+            {
+              "title": "5. Lerenden Empoweren",
+              "value": "domein5"
+            },
+            {
+              "title": "6. Lerenden Faciliteren",
+              "value": "domein6"
+            }
+          ]
+        },
+        "description": "Welk DigCompEdu domein wordt behandeld?",
+        "name": "digcompeduDomein",
+        "type": "string",
+        "title": "DigCompEdu Domein"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Stap 1: Doel bepalen",
+              "value": 1
+            },
+            {
+              "title": "Stap 2: Alternatieven wegen",
+              "value": 2
+            },
+            {
+              "title": "Stap 3: Waarden toepassen",
+              "value": 3
+            },
+            {
+              "title": "Stap 4: Samenwerken",
+              "value": 4
+            },
+            {
+              "title": "Stap 5: Verantwoordelijkheid",
+              "value": 5
+            },
+            {
+              "title": "Stap 6: Evalueren",
+              "value": 6
+            }
+          ]
+        },
+        "description": "Welke stap uit de Visietekst wordt behandeld?",
+        "name": "aiStap",
+        "type": "number",
+        "title": "Verantwoorde AI Stap"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 5
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Geschatte tijd om de module te voltooien",
+        "name": "duur",
+        "type": "number",
+        "title": "Duur (minuten)"
+      },
+      {
+        "rows": 2,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Wat leert de gebruiker in deze module?",
+        "name": "beschrijving",
+        "type": "text",
+        "title": "Korte Beschrijving"
+      },
+      {
+        "description": "De volledige inhoud van de module (tekst, uitleg, voorbeelden)",
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "i18nTitleKey": "inputs.portable-text.annotation.link",
+                  "options": {
+                    "modal": {
+                      "type": "popover"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^tel$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": true,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "description": "A valid web, email, phone, or relative link.",
+                      "name": "href",
+                      "type": "url",
+                      "title": "Link"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Italic"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                },
+                {
+                  "value": "underline",
+                  "title": "Underline"
+                },
+                {
+                  "value": "strike-through",
+                  "title": "Strike"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "inhoud",
+        "type": "array",
+        "title": "Module Inhoud"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "YouTube of Vimeo video die bij deze module hoort",
+        "name": "videoUrl",
+        "type": "url",
+        "title": "Video URL"
+      },
+      {
+        "rows": 3,
+        "description": "Opdracht die de gebruiker moet uitvoeren na de theorie",
+        "name": "praktijkopdracht",
+        "type": "text"
+      },
+      {
+        "description": "Welke AI tools komen aan bod? (bv. ChatGPT, NotebookLM)",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "tools",
+        "type": "array",
+        "title": "AI Tools"
+      },
+      {
+        "description": "Tutorials die de gebruiker kan raadplegen",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "tutorial"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to tutorial"
+          }
+        ],
+        "name": "tutorials",
+        "type": "array",
+        "title": "Gerelateerde Tutorials"
+      },
+      {
+        "description": "Optionele quiz om kennis te toetsen",
+        "of": [
+          {
+            "type": "quizVraag"
+          }
+        ],
+        "name": "quiz",
+        "type": "array",
+        "title": "Quiz Vragen"
+      }
+    ],
+    "name": "module",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "vraag",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 2
+              },
+              {
+                "flag": "max",
+                "constraint": 5
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Minstens 2, maximaal 5 antwoordopties",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "antwoorden",
+        "type": "array",
+        "title": "Antwoordopties"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Index van het juiste antwoord (0 = eerste optie)",
+        "name": "correctAntwoord",
+        "type": "number",
+        "title": "Correct Antwoord Index"
+      },
+      {
+        "rows": 2,
+        "description": "Uitleg waarom dit antwoord correct is",
+        "name": "uitleg",
+        "type": "text"
+      }
+    ],
+    "name": "quizVraag",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "url",
+        "type": "url",
+        "title": "YouTube URL"
+      },
+      {
+        "name": "caption",
+        "type": "string",
+        "title": "Onderschrift"
+      }
+    ],
+    "name": "youtube",
+    "type": "object",
+    "title": "YouTube Video"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "accept": "video/*"
+        },
+        "name": "video",
+        "type": "file"
+      },
+      {
+        "name": "caption",
+        "type": "string",
+        "title": "Onderschrift"
+      }
+    ],
+    "name": "videoFile",
+    "type": "object",
+    "title": "Video Bestand"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": false,
+        "description": "Zet aan om een opdracht aan deze tutorial toe te voegen",
+        "name": "ingeschakeld",
+        "type": "boolean",
+        "title": "Opdracht ingeschakeld"
+      },
+      {
+        "description": "De titel van de opdracht",
+        "hidden": "conditional",
+        "name": "titel",
+        "type": "string",
+        "title": "Opdracht Titel"
+      },
+      {
+        "rows": 5,
+        "description": "Wat moet de gebruiker doen?",
+        "hidden": "conditional",
+        "name": "instructie",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "URL naar de Google Sheets template (kopieer-link)",
+        "hidden": "conditional",
+        "name": "templateSheetUrl",
+        "type": "url",
+        "title": "Google Sheets Template URL"
+      },
+      {
+        "initialValue": 1,
+        "description": "Hoeveel tabbladen moet cursist uploaden? (meestal 5: data + draaitabellen + analyse)",
+        "hidden": "conditional",
+        "name": "aantalTabs",
+        "type": "number",
+        "title": "Aantal tabbladen"
+      },
+      {
+        "description": "Waarop wordt de opdracht beoordeeld?",
+        "of": [
+          {
+            "type": "criterium"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "criteria",
+        "type": "array",
+        "title": "Beoordelingscriteria"
+      },
+      {
+        "initialValue": 100,
+        "description": "Maximum haalbare score",
+        "hidden": "conditional",
+        "name": "maxScore",
+        "type": "number",
+        "title": "Maximum Score"
+      },
+      {
+        "description": "Optionele deadline",
+        "hidden": "conditional",
+        "name": "deadline",
+        "type": "datetime"
+      }
+    ],
+    "name": "opdracht",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "description": "Naam van het criterium (bv. \"Draaitabel correct\")",
+        "name": "naam",
+        "type": "string"
+      },
+      {
+        "rows": 2,
+        "description": "Wat wordt er geëvalueerd",
+        "name": "beschrijving",
+        "type": "text"
+      },
+      {
+        "rows": 3,
+        "description": "Wat moet er precies in de sheet staan? (bv. \"Eerste draaitabel toont geslacht vs geslaagd met GEMIDDELDE STUDIETIJD\")",
+        "name": "verwacht",
+        "type": "text",
+        "title": "Verwacht resultaat"
+      },
+      {
+        "description": "Specifieke dingen om te controleren in de data",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "controleer",
+        "type": "array",
+        "title": "Controleer op"
+      },
+      {
+        "initialValue": 1,
+        "description": "Hoe zwaar dit criterium telt (1-10)",
+        "name": "gewicht",
+        "type": "number"
+      }
+    ],
+    "name": "criterium",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Tekst links, Afbeelding rechts",
+              "value": "text-image"
+            },
+            {
+              "title": "Afbeelding links, Tekst rechts",
+              "value": "image-text"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "text-image",
+        "name": "layout",
+        "type": "string",
+        "title": "Indeling"
+      },
+      {
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "i18nTitleKey": "inputs.portable-text.annotation.link",
+                  "options": {
+                    "modal": {
+                      "type": "popover"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^tel$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": true,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "description": "A valid web, email, phone, or relative link.",
+                      "name": "href",
+                      "type": "url",
+                      "title": "Link"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Italic"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                },
+                {
+                  "value": "underline",
+                  "title": "Underline"
+                },
+                {
+                  "value": "strike-through",
+                  "title": "Strike"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "textColumn",
+        "type": "array",
+        "title": "Tekst Kolom"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "imageColumn",
+        "type": "image",
+        "title": "Afbeelding Kolom"
+      },
+      {
+        "name": "imageCaption",
+        "type": "string",
+        "title": "Afbeelding Onderschrift"
+      }
+    ],
+    "name": "twoColumn",
+    "type": "object",
+    "title": "Twee Kolommen"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image",
+        "title": "Afbeelding"
+      },
+      {
+        "description": "Beschrijving voor screen readers en SEO",
+        "name": "alt",
+        "type": "string",
+        "title": "Alt tekst"
+      },
+      {
+        "description": "Optioneel onderschrift onder de afbeelding",
+        "name": "caption",
+        "type": "string",
+        "title": "Onderschrift"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "🟢 Klein (max 400px)",
+              "value": "small"
+            },
+            {
+              "title": "🟡 Medium (max 600px)",
+              "value": "medium"
+            },
+            {
+              "title": "🟠 Groot (max 800px)",
+              "value": "large"
+            },
+            {
+              "title": "🔴 Volledige breedte",
+              "value": "full"
+            },
+            {
+              "title": "📐 Passend - breedte (geen bijsnijden)",
+              "value": "fit-width"
+            },
+            {
+              "title": "📏 Passend - hoogte (lange afbeeldingen)",
+              "value": "fit-height"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "large",
+        "description": "Kies hoe de afbeelding wordt weergegeven",
+        "name": "size",
+        "type": "string",
+        "title": "Grootte"
+      }
+    ],
+    "name": "customImage",
+    "type": "object",
+    "title": "Afbeelding met opties"
+  }
+]

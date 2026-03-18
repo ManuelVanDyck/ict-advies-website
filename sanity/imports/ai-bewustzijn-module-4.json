@@ -1,0 +1,45 @@
+{
+  "_type": "tutorial",
+  "title": "Module 4: Professionalisering & Netwerk",
+  "slug": "ai-bewustzijn-module-4",
+  "category": "AI bewustzijn",
+  "status": "published",
+  "featured": false,
+  "isSubtutorial": false,
+  "body": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "text": "AI evolueert razendsnel. Deze module focust op het op peil houden van je digitale geletterdheid en het delen van goede praktijken met collega's."
+        }
+      ]
+    }
+  ],
+  "opdracht": {
+    "ingeschakeld": true,
+    "titel": "Evaluatieprotocol",
+    "instructie": "Stel een kalender op met vaste evaluatiemomenten (bijv. na elke rapportperiode of aan het einde van het schooljaar). Formuleer drie reflectievragen die je op die momenten zult beantwoorden om te evalueren of de AI-toepassing nog steeds waardevol is.",
+    "criteria": [
+      {
+        "naam": "evaluatiemomenten",
+        "beschrijving": "Realistische en haalbare evaluatiemomenten in kalender opgesteld",
+        "gewicht": 40
+      },
+      {
+        "naam": "reflectievragen",
+        "beschrijving": "Drie kritische reflectievragen geformuleerd (bijv. over nauwkeurigheid, gebruik, meerwaarde)",
+        "gewicht": 30
+      },
+      {
+        "naam": "continu_proces",
+        "beschrijving": "Herkenning van de continue aard van AI-ontwikkeling",
+        "gewicht": 30
+      }
+    ],
+    "maxScore": 100,
+    "verplicht": true
+  }
+}
