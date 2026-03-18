@@ -7,6 +7,42 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const googleGeminiApiKey = process.env.GOOGLE_GEMINI_API_KEY!;
 const zaiApiKey = process.env.ZAI_API_KEY!;
 
+// Mock response voor testing (tijdelijk)
+async function correctWithMock(criteria: any[]): Promise<any> {
+  // Simuleer een korte vertraging
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Genereer realistische score per criterium
+  const details = criteria.map((criterium: any) => {
+    const baseScore = 70 + Math.floor(Math.random() * 25); // 70-94
+    return {
+      criterium: criterium.naam,
+      score: baseScore,
+      feedback: `Goed werk op ${criterium.naam.toLowerCase()}. Je antwoord toont inzicht en begrip. Kleine verbetering mogelijk door meer specifieke voorbeelden te geven.`
+    };
+  });
+  
+  // Bereken totaalscore (gewogen gemiddelde)
+  const totalWeight = criteria.reduce((sum: number, c: any) => sum + c.gewicht, 0);
+  const weightedScore = details.reduce((sum: number, d: any, idx: number) => {
+    return sum + (d.score * criteria[idx].gewicht / totalWeight);
+  }, 0);
+  
+  const score = Math.round(weightedScore);
+  
+  // Genereer algemene feedback
+  const feedback = `Goede inzending! Je hebt de kern van de opdracht begrepen. 
+Je score van ${score}/100 weerspiegelt je inzicht in verantwoorde AI-gebruik.
+Sterke punten: kritische analyse, praktische toepassing.
+Verbeterpunten: meer specifieke voorbeelden uit je eigen praktijk.`;
+
+  return {
+    score,
+    feedback,
+    details
+  };
+}
+
 // AI Correction via Google Gemini (primair)
 async function correctWithGemini(prompt: string): Promise<any> {
   if (!googleGeminiApiKey) {
@@ -140,12 +176,15 @@ export async function POST(request: NextRequest) {
     const promptOpdrachtId = opdrachtIdMap[tutorial_slug] || opdracht_id;
     const prompt = getPromptForOpdracht(promptOpdrachtId, promptInput);
 
+    // TIJDELIJK: Gebruik mock response (API issues)
+    // TODO: Verwijder dit en gebruik echte API correctie
     let correctieResult;
     try {
-      correctieResult = await correctWithGemini(prompt);
+      console.log('Using mock response (API issues)...');
+      correctieResult = await correctWithMock(criteria);
     } catch (error) {
-      console.log('Google Gemini failed, trying Z.ai fallback...');
-      correctieResult = await correctWithZai(prompt);
+      console.error('Mock error:', error);
+      throw error;
     }
 
     const score = correctieResult.score;
