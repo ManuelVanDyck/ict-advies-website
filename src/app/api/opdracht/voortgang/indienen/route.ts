@@ -6,6 +6,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const googleGeminiApiKey = process.env.GOOGLE_GEMINI_API_KEY || 'AIzaSyAa9L8KyqE_4ylWKo_LIco0GhVWLfPjjJY';
 const zaiApiKey = process.env.ZAI_API_KEY!;
+const claudeApiKey = process.env.ANTHROPIC_API_KEY || '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';
 
 // AI Correction via Ollama (primair - lokaal)
 async function correctWithOllama(prompt: string): Promise<any> {
@@ -29,6 +30,52 @@ async function correctWithOllama(prompt: string): Promise<any> {
     return JSON.parse(data.response);
   } catch (error) {
     console.error('Ollama error:', error);
+    throw error;
+  }
+}
+
+// AI Correction via Claude/Anthropic (primair - Vercel)
+async function correctWithClaude(prompt: string): Promise<any> {
+  if (!claudeApiKey) {
+    throw new Error('ANTHROPIC_API_KEY is not set');
+  }
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': claudeApiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-haiku-20241022',
+        max_tokens: 2048,
+        messages: [
+          {
+            role: 'user',
+            content: prompt + '\n\nGeef ALLEEN de JSON output, geen andere tekst.',
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Claude API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const content = data.content[0].text;
+
+    // Extract JSON from response
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No JSON found in Claude response');
+    }
+
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.error('Claude error:', error);
     throw error;
   }
 }
@@ -202,7 +249,7 @@ export async function POST(request: NextRequest) {
     const promptOpdrachtId = opdrachtIdMap[tutorial_slug] || opdracht_id;
     const prompt = getPromptForOpdracht(promptOpdrachtId, promptInput);
 
-    // AI Correctie - Google Gemini primair (Vercel), Ollama primair (lokaal), Z.ai fallback
+    // AI Correctie - Claude primair (Vercel), Ollama primair (lokaal)
     let correctieResult;
     const isLocalhost = process.env.NODE_ENV === 'development';
 
@@ -212,22 +259,27 @@ export async function POST(request: NextRequest) {
         console.log('Trying Ollama (local)...');
         correctieResult = await correctWithOllama(prompt);
       } catch (error) {
-        console.log('Ollama failed, trying Google Gemini...');
+        console.log('Ollama failed, trying Claude...');
+        try {
+          correctieResult = await correctWithClaude(prompt);
+        } catch (error2) {
+          console.log('Claude failed, trying Google Gemini...');
+          correctieResult = await correctWithGemini(prompt);
+        }
+      }
+    } else {
+      // Vercel/Production: Claude primair
+      try {
+        console.log('Trying Claude (production)...');
+        correctieResult = await correctWithClaude(prompt);
+      } catch (error) {
+        console.log('Claude failed, trying Google Gemini...');
         try {
           correctieResult = await correctWithGemini(prompt);
         } catch (error2) {
           console.log('Google Gemini failed, trying Z.ai fallback...');
           correctieResult = await correctWithZai(prompt);
         }
-      }
-    } else {
-      // Vercel/Production: Google Gemini primair
-      try {
-        console.log('Trying Google Gemini (production)...');
-        correctieResult = await correctWithGemini(prompt);
-      } catch (error) {
-        console.log('Google Gemini failed, trying Z.ai fallback...');
-        correctieResult = await correctWithZai(prompt);
       }
     }
 
