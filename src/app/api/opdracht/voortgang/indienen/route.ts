@@ -7,6 +7,32 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const googleGeminiApiKey = process.env.GOOGLE_GEMINI_API_KEY!;
 const zaiApiKey = process.env.ZAI_API_KEY!;
 
+// AI Correction via Ollama (primair - lokaal)
+async function correctWithOllama(prompt: string): Promise<any> {
+  try {
+    const response = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'qwen2.5:7b',
+        prompt: prompt,
+        stream: false,
+        format: 'json',
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ollama API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return JSON.parse(data.response);
+  } catch (error) {
+    console.error('Ollama error:', error);
+    throw error;
+  }
+}
+
 // Mock response voor testing (tijdelijk)
 async function correctWithMock(criteria: any[]): Promise<any> {
   // Simuleer een korte vertraging
@@ -176,15 +202,19 @@ export async function POST(request: NextRequest) {
     const promptOpdrachtId = opdrachtIdMap[tutorial_slug] || opdracht_id;
     const prompt = getPromptForOpdracht(promptOpdrachtId, promptInput);
 
-    // TIJDELIJK: Gebruik mock response (API issues)
-    // TODO: Verwijder dit en gebruik echte API correctie
+    // AI Correctie - Ollama primair (lokaal), Z.ai fallback, Google Gemini fallback 2
     let correctieResult;
     try {
-      console.log('Using mock response (API issues)...');
-      correctieResult = await correctWithMock(criteria);
+      console.log('Trying Ollama (local)...');
+      correctieResult = await correctWithOllama(prompt);
     } catch (error) {
-      console.error('Mock error:', error);
-      throw error;
+      console.log('Ollama failed, trying Google Gemini...');
+      try {
+        correctieResult = await correctWithGemini(prompt);
+      } catch (error2) {
+        console.log('Google Gemini failed, trying Z.ai fallback...');
+        correctieResult = await correctWithZai(prompt);
+      }
     }
 
     const score = correctieResult.score;
