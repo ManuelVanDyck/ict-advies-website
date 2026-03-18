@@ -4,9 +4,9 @@ import { getPromptForOpdracht, OpdrachtPromptInput } from '@/lib/opdracht-prompt
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const googleGeminiApiKey = process.env.GOOGLE_GEMINI_API_KEY || 'AIzaSyAa9L8KyqE_4ylWKo_LIco0GhVWLfPjjJY';
-const zaiApiKey = process.env.ZAI_API_KEY!;
-const claudeApiKey = process.env.ANTHROPIC_API_KEY || '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';
+const googleGeminiApiKey = process.env.GOOGLE_GEMINI_API_KEY;
+const zaiApiKey = process.env.ZAI_API_KEY;
+const claudeApiKey = process.env.ANTHROPIC_API_KEY;
 
 // AI Correction via Ollama (primair - lokaal)
 async function correctWithOllama(prompt: string): Promise<any> {
