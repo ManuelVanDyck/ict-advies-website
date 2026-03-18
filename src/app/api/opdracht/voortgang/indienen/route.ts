@@ -31,43 +31,45 @@ async function correctWithOllama(prompt: string): Promise<any> {
   }
 }
 
-// AI Correction via Z.ai (fallback)
-async function correctWithZai(prompt: string): Promise<any> {
+// AI Correction via Google Gemini (fallback)
+async function correctWithGemini(prompt: string): Promise<any> {
   try {
-    const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${googleGeminiApiKey}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.ZAI_API_KEY}`,
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'glm-4.7',
-        messages: [
+        contents: [
           {
-            role: 'user',
-            content: prompt + '\n\nGeef alleen de JSON output, geen andere tekst.',
+            parts: [
+              {
+                text: prompt + '\n\nGeef ALLEEN de JSON output, geen andere tekst.',
+              },
+            ],
           },
         ],
-        temperature: 0.7,
+        generationConfig: {
+          temperature: 0.7,
+          responseMimeType: 'application/json',
+        },
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`Z.ai API error: ${response.statusText}`);
+      throw new Error(`Google Gemini API error: ${response.statusText}`);
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
+    const content = data.candidates[0].content.parts[0].text;
 
     // Extract JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new Error('No JSON found in AI response');
+      throw new Error('No JSON found in Gemini response');
     }
 
     return JSON.parse(jsonMatch[0]);
   } catch (error) {
-    console.error('Z.ai error:', error);
+    console.error('Google Gemini error:', error);
     throw error;
   }
 }
@@ -115,9 +117,9 @@ export async function POST(request: NextRequest) {
 
     let correctieResult;
     try {
-      correctieResult = await correctWithOllama(prompt);
+      correctieResult = await correctWithGemini(prompt);
     } catch (error) {
-      console.log('Ollama failed, trying Z.ai fallback...');
+      console.log('Google Gemini failed, trying Z.ai fallback...');
       correctieResult = await correctWithZai(prompt);
     }
 
