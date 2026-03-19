@@ -19,17 +19,49 @@ export async function GET(request: NextRequest) {
     // Use service role key to bypass RLS
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { data: voortgang, error } = await supabase
-      .from('opdracht_voortgang')
-      .select('*')
-      .eq('user_email', user_email)
-      .order('created_at', { ascending: false });
+    // Haal voortgang uit beide tabellen
+    const [voortgangResult, inzendingenResult] = await Promise.all([
+      // Tabel 1: opdracht_voortgang (tekst-gebaseerde opdrachten)
+      supabase
+        .from('opdracht_voortgang')
+        .select('*')
+        .eq('user_email', user_email)
+        .order('created_at', { ascending: false }),
+      
+      // Tabel 2: opdracht_inzendingen (screenshot/sheet opdrachten)
+      supabase
+        .from('opdracht_inzendingen')
+        .select('*')
+        .eq('user_email', user_email)
+        .order('created_at', { ascending: false }),
+    ]);
 
-    if (error) {
-      throw error;
+    if (voortgangResult.error) {
+      console.error('Error fetching opdracht_voortgang:', voortgangResult.error);
+    }
+    
+    if (inzendingenResult.error) {
+      console.error('Error fetching opdracht_inzendingen:', inzendingenResult.error);
     }
 
-    return NextResponse.json({ voortgang });
+    // Combineer beide resultaten
+    const voortgang = voortgangResult.data || [];
+    const inzendingen = (inzendingenResult.data || []).map((item: any) => ({
+      ...item,
+      // Normalizeer veldnamen voor consistency
+      tutorial_slug: item.tutorial_slug,
+      opdracht_titel: item.opdracht_titel,
+    }));
+
+    // Merge en deduplicate op basis van tutorial_slug (laatste versie wint)
+    const allVoortgang = [...voortgang, ...inzendingen];
+    
+    // Sorteer op created_at
+    allVoortgang.sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    return NextResponse.json({ voortgang: allVoortgang });
   } catch (error) {
     console.error('Error in /api/opdracht/voortgang:', error);
     return NextResponse.json(

@@ -187,6 +187,8 @@ export async function POST(request: NextRequest) {
       antwoorden,
     } = body;
 
+    console.log('[Indienen] Request ontvangen:', { user_email, tutorial_slug, opdracht_id });
+
     if (!user_email || !tutorial_id || !opdracht_id || !antwoorden) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -194,100 +196,127 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // AI Correctie
-    const promptInput: OpdrachtPromptInput = {
-      titel: opdracht_titel,
-      instructie: instructie,
-      criteria,
-      antwoorden,
-    };
+    // Supabase client
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Map tutorial slug to opdracht ID for AI prompts
-    const opdrachtIdMap: Record<string, string> = {
-      'ai-bewustzijn-module-1': 'verantwoordingsmatrix',
-      'ai-bewustzijn-module-2': 'betrouwbaarheidsscan',
-      'ai-bewustzijn-module-3': 'participatieplan',
-      'ai-bewustzijn-module-4': 'evaluatieprotocol',
-    };
+    // AI Correctie proberen
+    let score: number | undefined;
+    let feedback: string | undefined;
+    let details: any = undefined;
+    let aiError: string | undefined;
 
-    const promptOpdrachtId = opdrachtIdMap[tutorial_slug] || opdracht_id;
-    const prompt = getPromptForOpdracht(promptOpdrachtId, promptInput);
+    try {
+      const promptInput: OpdrachtPromptInput = {
+        titel: opdracht_titel,
+        instructie: instructie,
+        criteria,
+        antwoorden,
+      };
 
-    // AI Correctie - Claude primair (Vercel), Ollama primair (lokaal)
-    let correctieResult;
-    const isLocalhost = process.env.NODE_ENV === 'development';
+      // Map tutorial slug to opdracht ID for AI prompts
+      const opdrachtIdMap: Record<string, string> = {
+        'ai-bewustzijn-module-1': 'verantwoordingsmatrix',
+        'ai-bewustzijn-module-2': 'betrouwbaarheidsscan',
+        'ai-bewustzijn-module-3': 'participatieplan',
+        'ai-bewustzijn-module-4': 'evaluatieprotocol',
+      };
 
-    if (isLocalhost) {
-      // Lokaal: Ollama primair (gratis, ongelimiteerd)
-      try {
-        console.log('Trying Ollama (local)...');
-        correctieResult = await correctWithOllama(prompt);
-      } catch (error) {
-        console.log('Ollama failed, trying Claude...');
+      const promptOpdrachtId = opdrachtIdMap[tutorial_slug] || opdracht_id;
+      const prompt = getPromptForOpdracht(promptOpdrachtId, promptInput);
+
+      // AI Correctie - Claude primair (Vercel), Ollama primair (lokaal)
+      let correctieResult;
+      const isLocalhost = process.env.NODE_ENV === 'development';
+
+      if (isLocalhost) {
+        // Lokaal: Ollama primair (gratis, ongelimiteerd)
+        try {
+          console.log('[Indienen] Trying Ollama (local)...');
+          correctieResult = await correctWithOllama(prompt);
+        } catch (error) {
+          console.log('[Indienen] Ollama failed, trying Claude...');
+          try {
+            correctieResult = await correctWithClaude(prompt);
+          } catch (error2) {
+            console.log('[Indienen] Claude failed, trying Google Gemini...');
+            correctieResult = await correctWithGemini(prompt);
+          }
+        }
+      } else {
+        // Vercel/Production: Claude primair, met fallback
+        console.log('[Indienen] Trying Claude (production)...');
+        console.log('[Indienen] Claude API key configured:', claudeApiKey ? 'YES' : 'NO');
         try {
           correctieResult = await correctWithClaude(prompt);
-        } catch (error2) {
-          console.log('Claude failed, trying Google Gemini...');
-          correctieResult = await correctWithGemini(prompt);
-        }
-      }
-    } else {
-      // Vercel/Production: Claude primair, met fallback
-      console.log('Trying Claude (production)...');
-      console.log('Claude API key configured:', claudeApiKey ? 'YES' : 'NO');
-      try {
-        correctieResult = await correctWithClaude(prompt);
-      } catch (error) {
-        console.log('Claude failed, trying Google Gemini...');
-        try {
-          correctieResult = await correctWithGemini(prompt);
-        } catch (error2) {
-          console.log('Google Gemini failed, trying Z.ai fallback...');
+          console.log('[Indienen] Claude success!');
+        } catch (error) {
+          console.log('[Indienen] Claude failed:', error instanceof Error ? error.message : error);
           try {
-            correctieResult = await correctWithZai(prompt);
-          } catch (error3: unknown) {
-            const errMsg1 = error instanceof Error ? error.message : 'Unknown error';
-            const errMsg2 = error2 instanceof Error ? error2.message : 'Unknown error';
-            const errMsg3 = error3 instanceof Error ? error3.message : 'Unknown error';
-            console.error('All AI providers failed:', { error: errMsg1, error2: errMsg2, error3: errMsg3 });
-            throw new Error(`Alle AI providers failed. Claude: ${errMsg1}, Gemini: ${errMsg2}, Z.ai: ${errMsg3}`);
+            console.log('[Indienen] Trying Google Gemini...');
+            correctieResult = await correctWithGemini(prompt);
+            console.log('[Indienen] Gemini success!');
+          } catch (error2) {
+            console.log('[Indienen] Gemini failed:', error2 instanceof Error ? error2.message : error2);
+            try {
+              console.log('[Indienen] Trying Z.ai...');
+              correctieResult = await correctWithZai(prompt);
+              console.log('[Indienen] Z.ai success!');
+            } catch (error3) {
+              const errMsg = error3 instanceof Error ? error3.message : 'Unknown error';
+              console.error('[Indienen] All AI providers failed:', errMsg);
+              throw new Error(`AI correctie tijdelijk niet beschikbaar: ${errMsg}`);
+            }
           }
         }
       }
+
+      score = correctieResult.score;
+      feedback = correctieResult.feedback;
+      details = correctieResult.details;
+      console.log('[Indienen] AI correctie voltooid, score:', score);
+
+    } catch (error) {
+      console.error('[Indienen] AI correctie error:', error);
+      aiError = error instanceof Error ? error.message : 'Unknown error';
+      // Continue zonder AI score - we slaan toch de voortgang op
     }
 
-    const score = correctieResult.score;
-    const feedback = correctieResult.feedback;
-    const details = correctieResult.details;
-
-    // Opslaan in Supabase
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // BELANGRIJK: Sla voortgang op ZELFS als AI faalt
+    console.log('[Indienen] Opslaan in Supabase...');
 
     // Check of er al een voortgang bestaat
-    const { data: existing } = await supabase
+    const { data: existing, error: selectError } = await supabase
       .from('opdracht_voortgang')
       .select('id')
       .eq('user_email', user_email)
       .eq('opdracht_id', opdracht_id)
       .single();
 
+    if (selectError && selectError.code !== 'PGRST116') {
+      console.error('[Indienen] Select error:', selectError);
+    }
+
+    const voortgangData = {
+      antwoorden,
+      voltooid: score !== undefined,
+      score: score || null,
+      feedback: feedback || (aiError ? `AI correctie niet beschikbaar. ${aiError}` : null),
+      status: score !== undefined ? 'voltooid' : 'ingediend',
+      completed_at: score !== undefined ? new Date().toISOString() : null,
+    };
+
+    let saveError;
     if (existing) {
       // Update bestaande
-      await supabase
+      const result = await supabase
         .from('opdracht_voortgang')
-        .update({
-          antwoorden,
-          voltooid: true,
-          score,
-          feedback,
-          correctie_data: details,
-          status: 'voltooid',
-          completed_at: new Date().toISOString(),
-        })
+        .update(voortgangData)
         .eq('id', existing.id);
+      saveError = result.error;
+      console.log('[Indienen] Update result:', saveError ? 'ERROR' : 'OK');
     } else {
       // Maak nieuwe
-      await supabase
+      const result = await supabase
         .from('opdracht_voortgang')
         .insert({
           user_email,
@@ -296,24 +325,28 @@ export async function POST(request: NextRequest) {
           tutorial_slug: tutorial_slug,
           opdracht_id: opdracht_id,
           opdracht_titel: opdracht_titel,
-          antwoorden,
-          voltooid: true,
-          score,
-          feedback,
-          correctie_data: details,
-          status: 'voltooid',
-          completed_at: new Date().toISOString(),
+          ...voortgangData,
         });
+      saveError = result.error;
+      console.log('[Indienen] Insert result:', saveError ? 'ERROR' : 'OK', saveError);
+    }
+
+    if (saveError) {
+      console.error('[Indienen] Save error:', saveError);
+      return NextResponse.json(
+        { error: `Database error: ${saveError.message}` },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      score,
-      feedback,
+      score: score || null,
+      feedback: feedback || aiError || 'Opgeslagen zonder AI correctie',
       details,
     });
   } catch (error) {
-    console.error('Error in /api/opdracht/voortgang/indienen:', error);
+    console.error('[Indienen] Error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

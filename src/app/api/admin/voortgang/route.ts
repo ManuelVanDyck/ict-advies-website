@@ -5,7 +5,7 @@ import { auth } from '@/lib/auth';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-// Admin: Alle voortgang ophalen
+// Admin: Alle voortgang ophalen (uit beide tabellen)
 export async function GET(request: NextRequest) {
   const session = await auth();
 
@@ -32,26 +32,43 @@ export async function GET(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    let query = supabase
-      .from('opdracht_voortgang')
-      .select('*')
-      .order('created_at', { ascending: false });
+    // Haal uit beide tabellen
+    const [voortgangResult, inzendingenResult] = await Promise.all([
+      supabase
+        .from('opdracht_voortgang')
+        .select('*')
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('opdracht_inzendingen')
+        .select('*')
+        .order('created_at', { ascending: false }),
+    ]);
 
+    let voortgang = voortgangResult.data || [];
+    let inzendingen = inzendingenResult.data || [];
+
+    // Apply filters
     if (tutorial_id) {
-      query = query.eq('tutorial_id', tutorial_id);
+      voortgang = voortgang.filter((v: any) => v.tutorial_id === tutorial_id);
+      inzendingen = inzendingen.filter((v: any) => v.tutorial_id === tutorial_id);
     }
 
     if (status) {
-      query = query.eq('status', status);
+      voortgang = voortgang.filter((v: any) => v.status === status);
+      inzendingen = inzendingen.filter((v: any) => v.status === status);
     }
 
-    const { data: voortgang, error } = await query;
+    // Combineer en sorteer
+    const allVoortgang = [...voortgang, ...inzendingen];
+    allVoortgang.sort((a: any, b: any) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
-    if (error) {
-      throw error;
+    if (voortgangResult.error || inzendingenResult.error) {
+      console.error('Errors:', voortgangResult.error, inzendingenResult.error);
     }
 
-    return NextResponse.json({ voortgang });
+    return NextResponse.json({ voortgang: allVoortgang });
   } catch (error) {
     console.error('Error in /api/admin/voortgang:', error);
     return NextResponse.json(
