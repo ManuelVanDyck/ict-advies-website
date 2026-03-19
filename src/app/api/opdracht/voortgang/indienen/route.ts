@@ -232,10 +232,25 @@ export async function POST(request: NextRequest) {
         }
       }
     } else {
-      // Vercel/Production: Claude primair
+      // Vercel/Production: Claude primair, met fallback
       console.log('Trying Claude (production)...');
       console.log('Claude API key configured:', claudeApiKey ? 'YES' : 'NO');
-      correctieResult = await correctWithClaude(prompt);
+      try {
+        correctieResult = await correctWithClaude(prompt);
+      } catch (error) {
+        console.log('Claude failed, trying Google Gemini...');
+        try {
+          correctieResult = await correctWithGemini(prompt);
+        } catch (error2) {
+          console.log('Google Gemini failed, trying Z.ai fallback...');
+          try {
+            correctieResult = await correctWithZai(prompt);
+          } catch (error3) {
+            console.error('All AI providers failed:', { error: error.message, error2: error2.message, error3: error3.message });
+            throw new Error(`Alle AI providers failed. Claude: ${error.message}, Gemini: ${error2.message}, Z.ai: ${error3.message}`);
+          }
+        }
+      }
     }
 
     const score = correctieResult.score;
