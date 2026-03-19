@@ -82,8 +82,10 @@ async function correctWithClaude(prompt: string): Promise<any> {
 
 // Mock response voor testing (tijdelijk)
 async function correctWithMock(criteria: any[]): Promise<any> {
-  // Simuleer een korte vertraging
+  // Simuleer een korte vertraging (500ms)
   await new Promise(resolve => setTimeout(resolve, 500));
+  // Force redeploy on env var update - v2
+  console.log('Redeploy triggered for new ANTHROPIC_API_KEY');
   
   // Genereer realistische score per criterium
   const details = criteria.map((criterium: any) => {
@@ -271,6 +273,7 @@ export async function POST(request: NextRequest) {
       // Vercel/Production: Claude primair, met mock fallback
       try {
         console.log('Trying Claude (production)...');
+      console.log('Claude API key configured:', claudeApiKey ? 'YES' : 'NO');
         correctieResult = await correctWithClaude(prompt);
       } catch (error) {
         console.log('Claude failed, trying Google Gemini...');
