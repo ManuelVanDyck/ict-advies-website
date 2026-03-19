@@ -49,7 +49,7 @@ async function correctWithClaude(prompt: string): Promise<any> {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-3-5-haiku-20241022',
+        model: 'claude-3-5-haiku', // Let's try the alias instead
         max_tokens: 2048,
         messages: [
           {
