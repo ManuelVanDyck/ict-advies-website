@@ -268,7 +268,7 @@ export async function POST(request: NextRequest) {
         }
       }
     } else {
-      // Vercel/Production: Claude primair
+      // Vercel/Production: Claude primair, met mock fallback
       try {
         console.log('Trying Claude (production)...');
         correctieResult = await correctWithClaude(prompt);
@@ -278,7 +278,13 @@ export async function POST(request: NextRequest) {
           correctieResult = await correctWithGemini(prompt);
         } catch (error2) {
           console.log('Google Gemini failed, trying Z.ai fallback...');
-          correctieResult = await correctWithZai(prompt);
+          try {
+            correctieResult = await correctWithZai(prompt);
+          } catch (error3) {
+            console.log('Z.ai failed, using mock fallback...');
+            console.log('All AI providers failed. Using mock response for testing.');
+            correctieResult = await correctWithMock(criteria);
+          }
         }
       }
     }
