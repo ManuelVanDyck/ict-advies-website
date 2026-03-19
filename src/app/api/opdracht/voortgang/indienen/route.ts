@@ -245,9 +245,12 @@ export async function POST(request: NextRequest) {
           console.log('Google Gemini failed, trying Z.ai fallback...');
           try {
             correctieResult = await correctWithZai(prompt);
-          } catch (error3) {
-            console.error('All AI providers failed:', { error: error.message, error2: error2.message, error3: error3.message });
-            throw new Error(`Alle AI providers failed. Claude: ${error.message}, Gemini: ${error2.message}, Z.ai: ${error3.message}`);
+          } catch (error3: unknown) {
+            const errMsg1 = error instanceof Error ? error.message : 'Unknown error';
+            const errMsg2 = error2 instanceof Error ? error2.message : 'Unknown error';
+            const errMsg3 = error3 instanceof Error ? error3.message : 'Unknown error';
+            console.error('All AI providers failed:', { error: errMsg1, error2: errMsg2, error3: errMsg3 });
+            throw new Error(`Alle AI providers failed. Claude: ${errMsg1}, Gemini: ${errMsg2}, Z.ai: ${errMsg3}`);
           }
         }
       }
