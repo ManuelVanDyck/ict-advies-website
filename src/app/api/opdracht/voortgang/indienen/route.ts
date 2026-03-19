@@ -80,45 +80,7 @@ async function correctWithClaude(prompt: string): Promise<any> {
   }
 }
 
-// Mock response voor testing (tijdelijk)
-async function correctWithMock(criteria: any[]): Promise<any> {
-  // Simuleer een korte vertraging (500ms)
-  await new Promise(resolve => setTimeout(resolve, 500));
-  // Force redeploy on env var update - v2
-  console.log('Redeploy triggered for new ANTHROPIC_API_KEY');
-  
-  // Genereer realistische score per criterium
-  const details = criteria.map((criterium: any) => {
-    const baseScore = 70 + Math.floor(Math.random() * 25); // 70-94
-    return {
-      criterium: criterium.naam,
-      score: baseScore,
-      feedback: `Goed werk op ${criterium.naam.toLowerCase()}. Je antwoord toont inzicht en begrip. Kleine verbetering mogelijk door meer specifieke voorbeelden te geven.`
-    };
-  });
-  
-  // Bereken totaalscore (gewogen gemiddelde)
-  const totalWeight = criteria.reduce((sum: number, c: any) => sum + c.gewicht, 0);
-  const weightedScore = details.reduce((sum: number, d: any, idx: number) => {
-    return sum + (d.score * criteria[idx].gewicht / totalWeight);
-  }, 0);
-  
-  const score = Math.round(weightedScore);
-  
-  // Genereer algemene feedback
-  const feedback = `Goede inzending! Je hebt de kern van de opdracht begrepen. 
-Je score van ${score}/100 weerspiegelt je inzicht in verantwoorde AI-gebruik.
-Sterke punten: kritische analyse, praktische toepassing.
-Verbeterpunten: meer specifieke voorbeelden uit je eigen praktijk.`;
-
-  return {
-    score,
-    feedback,
-    details
-  };
-}
-
-// AI Correction via Google Gemini (primair)
+// AI Correction via Google Gemini (fallback)
 async function correctWithGemini(prompt: string): Promise<any> {
   if (!googleGeminiApiKey) {
     throw new Error('GOOGLE_GEMINI_API_KEY is not set');
@@ -270,26 +232,10 @@ export async function POST(request: NextRequest) {
         }
       }
     } else {
-      // Vercel/Production: Claude primair, met mock fallback
-      try {
-        console.log('Trying Claude (production)...');
+      // Vercel/Production: Claude primair
+      console.log('Trying Claude (production)...');
       console.log('Claude API key configured:', claudeApiKey ? 'YES' : 'NO');
-        correctieResult = await correctWithClaude(prompt);
-      } catch (error) {
-        console.log('Claude failed, trying Google Gemini...');
-        try {
-          correctieResult = await correctWithGemini(prompt);
-        } catch (error2) {
-          console.log('Google Gemini failed, trying Z.ai fallback...');
-          try {
-            correctieResult = await correctWithZai(prompt);
-          } catch (error3) {
-            console.log('Z.ai failed, using mock fallback...');
-            console.log('All AI providers failed. Using mock response for testing.');
-            correctieResult = await correctWithMock(criteria);
-          }
-        }
-      }
+      correctieResult = await correctWithClaude(prompt);
     }
 
     const score = correctieResult.score;
