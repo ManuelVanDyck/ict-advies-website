@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, GraduationCap, CheckCircle2, PlayCircle, BookOpen, Lightbulb } from 'lucide-react';
 import { client } from '@/sanity/client';
+import LeerpadModules from '@/components/LeerpadModules';
 
 export default async function LeerpadDetailPage({
   params,
@@ -155,61 +156,7 @@ export default async function LeerpadDetailPage({
                 Modules ({leerpad.modules.length})
               </h2>
 
-              <div className="space-y-6">
-                {leerpad.modules.map((module: any, idx: number) => (
-                  <div
-                    key={module._id}
-                    className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-start gap-4">
-                        <div className="flex items-center justify-center w-10 h-10 bg-brand-red/10 rounded-full">
-                          <span className="font-bold text-brand-red">{idx + 1}</span>
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-lg text-gray-900 mb-1">
-                            {module.title}
-                          </h3>
-                          {module.category && (
-                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                              {module.category.title}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      {module.opdracht?.verplicht && (
-                        <span className="text-xs bg-brand-red text-white px-3 py-1 rounded-full font-medium">
-                          Verplicht
-                        </span>
-                      )}
-                    </div>
-
-                    {module.body && (
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                        {module.body[0]?.children?.[0]?.text}
-                      </p>
-                    )}
-
-                    {module.opdracht?.ingeschakeld && (
-                      <div className="bg-brand-cream rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <CheckCircle2 className="w-5 h-5 text-brand-red" />
-                          <span className="font-semibold text-gray-900">Opdracht</span>
-                        </div>
-                        <p className="text-sm text-gray-700">{module.opdracht.titel}</p>
-                      </div>
-                    )}
-
-                    <Link
-                      href={`/tutorials/${module.slug?.current}`}
-                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand-green text-white rounded-lg font-medium hover:bg-green-600 transition-colors"
-                    >
-                      <PlayCircle className="w-5 h-5" />
-                      Start module
-                    </Link>
-                  </div>
-                ))}
-              </div>
+              <LeerpadModules modules={leerpad.modules} />
             </div>
           )}
 

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { generateOpdrachtPDF, PDFData } from '@/lib/pdf/opdracht-pdf';
-import { Loader2, Download, Save, Send, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, Download, Save, Send, FileText, CheckCircle2, AlertCircle, ArrowRight, RotateCcw, Lock } from 'lucide-react';
 
 interface Criterium {
   naam: string;
@@ -32,6 +33,16 @@ interface AntwoordData {
   [key: string]: string;
 }
 
+// Module volgorde mapping
+const MODULE_ORDER: Record<string, number> = {
+  'ai-bewustzijn-module-1': 1,
+  'ai-bewustzijn-module-2': 2,
+  'ai-bewustzijn-module-3': 3,
+  'ai-bewustzijn-module-4': 4,
+};
+
+const PASSING_SCORE = 50;
+
 export default function OpdrachtTekstComponent({
   opdracht,
   tutorialId,
@@ -49,12 +60,54 @@ export default function OpdrachtTekstComponent({
     status: string;
   } | null>(null);
   const [savedDraft, setSavedDraft] = useState(false);
+  const [moduleProgress, setModuleProgress] = useState<Record<string, { completed: boolean; score: number; unlocked: boolean; passed: boolean }>>({});
+  const [checkingAccess, setCheckingAccess] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
 
-  // Initialize antwoorden with empty strings for each criterium
+  const currentModuleIndex = MODULE_ORDER[tutorialSlug] || 1;
+
+  // Initialize antwoorden
   const initialAntwoorden: AntwoordData = {};
   opdracht.criteria.forEach((c) => {
     initialAntwoorden[c.naam] = '';
   });
+
+  // Check module access on mount
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (!session?.user?.email) {
+        setCheckingAccess(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/leerpad/voortgang/modules?user_email=${session.user.email}`);
+        if (response.ok) {
+          const data = await response.json();
+          setModuleProgress(data.moduleProgress || {});
+
+          // Check if this module is unlocked
+          const thisModule = data.moduleProgress?.[tutorialSlug];
+          if (currentModuleIndex > 1 && !thisModule?.unlocked) {
+            setAccessDenied(true);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking access:', error);
+      } finally {
+        setCheckingAccess(false);
+      }
+    };
+
+    checkAccess();
+  }, [session?.user?.email, tutorialSlug, currentModuleIndex]);
+
+  // Get next module slug
+  const getNextModuleSlug = (): string | null => {
+    const nextIndex = currentModuleIndex + 1;
+    const nextSlug = Object.entries(MODULE_ORDER).find(([_, idx]) => idx === nextIndex)?.[0];
+    return nextSlug || null;
+  };
 
   const handleAntwoordChange = (criterium: string, value: string) => {
     setAntwoorden(prev => ({ ...prev, [criterium]: value }));
@@ -99,7 +152,6 @@ export default function OpdrachtTekstComponent({
       return;
     }
 
-    // Check of alle verplichte velden ingevuld zijn
     const incomplete = opdracht.criteria.some(c => !antwoorden[c.naam] || antwoorden[c.naam].trim() === '');
     if (incomplete) {
       alert('Vul eerst alle vragen in voordat je indient.');
@@ -146,6 +198,11 @@ export default function OpdrachtTekstComponent({
     }
   };
 
+  const handleRetry = () => {
+    setResult(null);
+    setAntwoorden(initialAntwoorden);
+  };
+
   const handleDownloadPDF = () => {
     const pdfData: PDFData = {
       tutorial: tutorialTitle,
@@ -169,6 +226,44 @@ export default function OpdrachtTekstComponent({
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+
+  const isPassed = result?.score !== undefined && result.score >= PASSING_SCORE;
+  const nextModuleSlug = getNextModuleSlug();
+
+  // Loading state
+  if (checkingAccess) {
+    return (
+      <div className="bg-brand-cream rounded-lg p-6 mt-8">
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-8 h-8 animate-spin text-brand-red" />
+        </div>
+      </div>
+    );
+  }
+
+  // Access denied - show locked message
+  if (accessDenied) {
+    return (
+      <div className="bg-brand-cream rounded-lg p-6 mt-8">
+        <div className="flex items-center gap-4 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <Lock className="w-8 h-8 text-yellow-600" />
+          <div>
+            <h3 className="font-bold text-yellow-800 mb-1">Module vergrendeld</h3>
+            <p className="text-yellow-700">
+              Je moet eerst Module {currentModuleIndex - 1} voltooien (score ≥ {PASSING_SCORE}%) voordat je deze module kunt starten.
+            </p>
+            <Link
+              href="/leerpaden/ai-bewustzijn"
+              className="mt-3 inline-flex items-center gap-2 text-brand-red hover:underline"
+            >
+              <ArrowRight className="w-4 h-4 rotate-180" />
+              Terug naar leerpad
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-brand-cream rounded-lg p-6 mt-8">
@@ -246,22 +341,24 @@ export default function OpdrachtTekstComponent({
       ) : (
         /* Resultaat */
         <div className="space-y-6">
+          {/* Score display */}
           <div className="bg-white rounded-lg p-6 text-center">
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-lg font-bold ${
-              result.score! >= 70 ? 'bg-green-100 text-green-700' :
-              result.score! >= 50 ? 'bg-yellow-100 text-yellow-700' :
-              'bg-red-100 text-red-700'
+              isPassed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
             }`}>
-              {result.score! >= 70 ? <CheckCircle2 className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
+              {isPassed ? <CheckCircle2 className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
               Score: {result.score}/100
+              {isPassed ? ' - Geslaagd!' : ' - Niet geslaagd'}
             </div>
           </div>
 
+          {/* Feedback */}
           <div className="bg-white rounded-lg p-6">
             <h4 className="font-semibold mb-3">Feedback</h4>
             <p className="text-gray-700">{result.feedback}</p>
           </div>
 
+          {/* Details per criterium */}
           {result.details && result.details.length > 0 && (
             <div className="bg-white rounded-lg p-6">
               <h4 className="font-semibold mb-4">Details per criterium</h4>
@@ -285,14 +382,44 @@ export default function OpdrachtTekstComponent({
             </div>
           )}
 
-          {/* PDF download */}
-          <button
-            onClick={handleDownloadPDF}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand-green text-white rounded-lg font-semibold hover:bg-green-600 transition-colors"
-          >
-            <Download className="w-5 h-5" />
-            Download als PDF
-          </button>
+          {/* Actie knoppen */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {isPassed && nextModuleSlug ? (
+              <Link
+                href={`/tutorials/${nextModuleSlug}`}
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-brand-green text-white rounded-lg font-semibold hover:bg-green-600 transition-colors"
+              >
+                Volgende module
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            ) : !isPassed ? (
+              <button
+                onClick={handleRetry}
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-brand-red text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
+              >
+                <RotateCcw className="w-5 h-5" />
+                Opnieuw proberen
+              </button>
+            ) : null}
+
+            <button
+              onClick={handleDownloadPDF}
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+            >
+              <Download className="w-5 h-5" />
+              Download PDF
+            </button>
+          </div>
+
+          {/* Info bij niet geslaagd */}
+          {!isPassed && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <p className="text-sm text-yellow-800">
+                <strong>Herkansing:</strong> Je moet minimaal {PASSING_SCORE}% halen om door te gaan naar de volgende module. 
+                Verbeter je antwoorden en dien opnieuw in.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
