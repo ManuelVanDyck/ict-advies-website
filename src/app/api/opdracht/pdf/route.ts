@@ -11,49 +11,67 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json({ error: 'id is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'id is required' },
+        { status: 400 }
+      );
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Haal voortgang op
-    const { data: voortgang, error } = await supabase
-      .from('opdracht_voortgang')
-      .select('*')
-      .eq('id', id)
-      .single();
+    // Haal voortgang uit beide tabellen
+    const [voortgangResult, inzendingenResult] = await Promise.all([
+      supabase
+        .from('opdracht_voortgang')
+        .select('*')
+        .eq('id', id)
+        .single(),
+      supabase
+        .from('opdracht_inzendingen')
+        .select('*')
+        .eq('id', id)
+        .single(),
+    ]);
 
-    if (error || !voortgang) {
-      return NextResponse.json({ error: 'Voortgang niet gevonden' }, { status: 404 });
+    const voortgang = voortgangResult.data || inzendingenResult.data;
+
+    if (!voortgang) {
+      return NextResponse.json(
+        { error: 'Voortgang niet gevonden' },
+        { status: 404 }
+      );
     }
 
-    // Bouw PDF data
-    const pdfData: PDFData = {
-      tutorial: voortgang.tutorial_slug || 'Onbekende tutorial',
-      opdracht_titel: voortgang.opdracht_titel || 'Onbekende opdracht',
-      instructie: 'Raadpleeg de tutorial voor de volledige instructies.',
+    // Format the data for PDF
+    const data: PDFData = {
+      tutorial: voortgang.tutorial_slug || '',
+      opdracht_titel: voortgang.opdracht_titel || '',
+      instructie: 'Deze opdracht is gemaakt als onderdeel van een leerpad.',
       antwoorden: voortgang.antwoorden || {},
-      score: voortgang.score,
-      feedback: voortgang.feedback,
-      details: voortgang.correctie_data || undefined,
+      score: voortgang.score || 0,
+      feedback: voortgang.feedback || '',
+      details: typeof voortgang.correctie_data === 'string' 
+        ? JSON.parse(voortgang.correctie_data)
+        : undefined,
       user_name: voortgang.user_name || 'Onbekend',
-      date: voortgang.completed_at 
-        ? new Date(voortgang.completed_at).toLocaleDateString('nl-BE')
-        : new Date(voortgang.created_at).toLocaleDateString('nl-BE'),
-    };
+      date: new Date(voortgang.completed_at || voortgang.created_at).toLocaleDateString('nl-BE'),
+    }
 
-    // Genereer PDF
-    const blob = generateOpdrachtPDF(pdfData);
-    const buffer = await blob.arrayBuffer();
+    // Generate PDF
+    const pdfBlob = generateOpdrachtPDF(data)
 
-    return new NextResponse(Buffer.from(buffer), {
+    // Return PDF
+    return new NextResponse(pdfBlob, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="opdracht-${voortgang.opdracht_titel?.replace(/\s+/g, '-') || 'export'}-${Date.now()}.pdf"`,
+        'Content-Disposition': `attachment; filename="opdracht-${data.opdracht_titel.replace(/[^a-z0-9()]/g, '_')}-${Date.now()}.pdf"`,
       },
     });
   } catch (error) {
     console.error('[PDF] Error:', error);
-    return NextResponse.json({ error: 'PDF generatie mislukt' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to generate PDF' },
+      { status: 500 }
+    );
   }
 }
