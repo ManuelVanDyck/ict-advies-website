@@ -18,6 +18,8 @@ interface CorrectionRequest {
   screenshots?: string[]; // Base64 encoded images
 }
 
+const claudeApiKey = process.env.ANTHROPIC_API_KEY;
+
 // Helper: fetch with timeout
 async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number): Promise<Response> {
   const controller = new AbortController();
@@ -32,6 +34,86 @@ async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: nu
   } finally {
     clearTimeout(timeout);
   }
+}
+
+// Anthropic Claude API call (primary for Vercel)
+async function correctWithClaude(
+  prompt: string,
+  screenshots?: string[]
+): Promise<{ score: number; feedback: string; details: Record<string, number> }> {
+  const claudeApiKey = process.env.ANTHROPIC_API_KEY;
+  
+  if (!claudeApiKey) {
+    throw new Error('ANTHROPIC_API_KEY is not set');
+  }
+
+  console.log('[Correctie] Claude API aanroepen...');
+
+  // For vision: Claude can analyze images directly
+  const content: any[] = [];
+  
+  // Add text content
+  content.push({
+    type: 'text',
+    text: prompt,
+  });
+
+  // Add images if provided
+  if (screenshots && screenshots.length > 0) {
+    screenshots.forEach((img, idx) => {
+      const base64Match = img.match(/^data:image\/(\w+);base64,(.+)$/);
+      if (base64Match) {
+        content.push({
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: `image/${base64Match[1]}`,
+            data: base64Match[2],
+          },
+        });
+      }
+    });
+  }
+
+  const response = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': claudeApiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514', // Claude Sonnet for vision
+      max_tokens: 2048,
+      messages: [
+        {
+          role: 'user',
+          content: content,
+        },
+      ],
+    }),
+  }, 120000); // 2 min timeout
+
+  if (!response.ok) {
+    throw new Error(`Claude API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  const responseText = data.content[0].text;
+
+  // Parse JSON from response
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('No JSON found in Claude response');
+  }
+
+  const result = JSON.parse(jsonMatch[0]);
+  
+  return {
+    score: Math.min(result.score || 0, 100),
+    feedback: result.feedback || 'Geen feedback beschikbaar.',
+    details: result.details || {},
+  };
 }
 
 // Read Google Sheet content - prefer CSV export (works with public sheets)
@@ -389,54 +471,76 @@ async function correctWithAI(
   if (screenshots && screenshots.length > 0) {
     return correctWithScreenshots(screenshots, criteria, maxScore);
   }
+  
   const prompt = buildPrompt(criteria, maxScore, sheetUrl, pdfUrl, sheetContent);
+  const isLocalhost = process.env.NODE_ENV === 'development';
 
-  // Try Ollama first (local, free) - with 90 second timeout
+  // Lokaal: Ollama primair (gratis, ongelimiteerd)
+  if (isLocalhost) {
+    try {
+      console.log('[Correctie] Ollama starten (lokaal)...');
+      const response = await fetchWithTimeout('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'mistral:7b',
+          prompt: prompt,
+          stream: false,
+          options: {
+            temperature: 0.3,
+            num_predict: 2000,
+          }
+        }),
+      }, 90000); // 90 seconden timeout
+
+      if (!response.ok) {
+        throw new Error(`Ollama error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.response;
+
+      if (!content) {
+        throw new Error('No response from Ollama');
+      }
+
+      // Parse JSON from response
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No JSON found in response');
+      }
+      
+      const result = JSON.parse(jsonMatch[0]);
+      
+      return {
+        score: Math.min(result.score || 0, maxScore),
+        feedback: result.feedback || 'Geen feedback beschikbaar.',
+        details: result.details || {},
+      };
+    } catch (ollamaError) {
+      console.error('[Correctie] Ollama error:', ollamaError);
+      // Fallback to Claude
+      try {
+        console.log('[Correctie] Fallback naar Claude...');
+        return await correctWithClaude(prompt);
+      } catch (claudeError) {
+        // Fallback to Z.ai
+        return correctWithZai(sheetUrl, pdfUrl, criteria, maxScore, sheetContent);
+      }
+    }
+  }
+
+  // Vercel/Production: Claude primair, met fallback
+  console.log('[Correctie] Claude starten (productie)...');
+  const claudeApiKey = process.env.ANTHROPIC_API_KEY;
+  console.log('[Correctie] Claude API key configured:', claudeApiKey ? 'YES' : 'NO');
+  
   try {
-    console.log('[Correctie] Ollama starten...');
-    const response = await fetchWithTimeout('http://localhost:11434/api/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'mistral:7b',
-        prompt: prompt,
-        stream: false,
-        options: {
-          temperature: 0.3,
-          num_predict: 2000,
-        }
-      }),
-    }, 90000); // 90 seconden timeout
-
-    if (!response.ok) {
-      throw new Error(`Ollama error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.response;
-
-    if (!content) {
-      throw new Error('No response from Ollama');
-    }
-
-    // Parse JSON from response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in response');
-    }
-    
-    const result = JSON.parse(jsonMatch[0]);
-    
-    return {
-      score: Math.min(result.score || 0, maxScore),
-      feedback: result.feedback || 'Geen feedback beschikbaar.',
-      details: result.details || {},
-    };
-  } catch (ollamaError) {
-    console.error('[Correctie] Ollama error:', ollamaError);
-    
+    return await correctWithClaude(prompt);
+  } catch (claudeError) {
+    console.log('[Correctie] Claude failed:', claudeError instanceof Error ? claudeError.message : claudeError);
     // Fallback to Z.ai
     return correctWithZai(sheetUrl, pdfUrl, criteria, maxScore, sheetContent);
   }
