@@ -56,6 +56,10 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
   }
 
   const hasOpdracht = tutorial.opdracht?.ingeschakeld && tutorial.opdracht?.titel;
+  
+  // Check if this tutorial is part of a leerpad
+  const isLeerpadModule = slug.includes('ai-bewustzijn-module');
+  const leerpadSlug = isLeerpadModule ? 'ai-bewustzijn' : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -68,23 +72,41 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
               <nav className="text-sm text-gray-400 mb-6 flex items-center gap-2 flex-wrap">
                 <Link href="/" className="hover:text-white transition">Home</Link>
                 <span>/</span>
-                <Link href="/tutorials" className="hover:text-white transition">Tutorials</Link>
-                {tutorial.category && (
+                {leerpadSlug ? (
                   <>
+                    <Link href="/leerpaden" className="hover:text-white transition">Leerpaden</Link>
                     <span>/</span>
                     <Link 
-                      href={`/tutorials?categorie=${tutorial.category.slug.current}`} 
+                      href={`/leerpaden/${leerpadSlug}`} 
                       className="hover:text-white transition"
                     >
-                      {tutorial.category.title}
+                      AI Bewustzijn
                     </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/tutorials" className="hover:text-white transition">Tutorials</Link>
+                    {tutorial.category && (
+                      <>
+                        <span>/</span>
+                        <Link 
+                          href={`/tutorials?categorie=${tutorial.category.slug.current}`} 
+                          className="hover:text-white transition"
+                        >
+                          {tutorial.category.title}
+                        </Link>
+                      </>
+                    )}
                   </>
                 )}
               </nav>
 
-              <Link href="/tutorials" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition">
+              <Link 
+                href={leerpadSlug ? `/leerpaden/${leerpadSlug}` : '/tutorials'} 
+                className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition"
+              >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Alle tutorials</span>
+                <span>{leerpadSlug ? 'Terug naar het leerpad' : 'Alle tutorials'}</span>
               </Link>
               
               {tutorial.category && (
@@ -142,11 +164,11 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
       <section className="py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <Link 
-            href="/tutorials" 
+            href={leerpadSlug ? `/leerpaden/${leerpadSlug}` : '/tutorials'} 
             className="inline-flex items-center gap-2 text-gray-600 hover:text-brand-red font-medium transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Terug naar alle tutorials</span>
+            <span>{leerpadSlug ? 'Terug naar het leerpad' : 'Terug naar alle tutorials'}</span>
           </Link>
         </div>
       </section>
