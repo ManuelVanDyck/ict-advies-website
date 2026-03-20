@@ -201,19 +201,13 @@ export default function MijnVoortgangPage() {
               )}
 
               <div className="mt-4 flex gap-2">
-                <a
-                  href={`/tutorial/${item.tutorial_slug}`}
-                  className="flex items-center gap-2 px-4 py-2 text-sm bg-brand-orange text-white rounded-lg hover:bg-orange-600 transition-colors"
-                >
-                  Bekijk tutorial
-                </a>
                 {item.status === 'voltooid' && (
                   <a
-                    href={`/api/opdracht/voortgang/${item.id}/pdf`}
-                    className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    href={`/api/opdracht/pdf?id=${item.id}`}
+                    className="flex items-center gap-2 px-4 py-2 text-sm bg-brand-green text-white rounded-lg hover:bg-green-600 transition-colors"
                   >
                     <Download className="w-4 h-4" />
-                    PDF
+                    Download PDF
                   </a>
                 )}
               </div>
