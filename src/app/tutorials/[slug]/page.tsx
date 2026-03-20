@@ -4,6 +4,8 @@ import { ArrowLeft, BookOpen } from 'lucide-react';
 import CustomPortableText from '@/components/PortableText';
 import OpdrachtComponent from '@/components/OpdrachtComponent';
 import OpdrachtTekstClient from '@/components/OpdrachtTekstClient';
+import GoogleTrainingenHub from '@/components/GoogleTrainingenHub';
+import GoogleTrainingDetail from '@/components/GoogleTrainingDetail';
 
 // Force dynamic rendering in development for instant updates
 export const dynamic = 'force-dynamic';
@@ -39,6 +41,94 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
       }
     }
   `, { slug });
+
+  // Check if this is a Google training subtutorial
+  const googleTrainingSlugs = [
+    'google-vids-training',
+    'google-workspace-basis',
+    'google-workspace-gevorderd',
+    'google-premium-functies',
+    'digitaal-burgerschap-veiligheid',
+    'onderwijs-op-afstand',
+    'certified-coaches',
+    'google-ai-onderwijs'
+  ];
+  const isGoogleTraining = googleTrainingSlugs.includes(slug);
+
+  // Handle Google training pages even without Sanity document
+  if (!tutorial && isGoogleTraining) {
+    const trainingTitles: Record<string, string> = {
+      'google-vids-training': "Makkelijk video's maken voor het onderwijs met Google Vids",
+      'google-workspace-basis': "Basisprincipes van Google Workspace for Education Fundamentals",
+      'google-workspace-gevorderd': "Gevorderd gebruik van Google Workspace for Education Fundamentals",
+      'google-premium-functies': "Premium functies voor leerlingen en docenten",
+      'digitaal-burgerschap-veiligheid': "Cursus 'Digitaal burgerschap en veiligheid'",
+      'onderwijs-op-afstand': "Onderwijs op afstand voor docenten",
+      'certified-coaches': "Lesprogramma voor Certified Coaches",
+      'google-ai-onderwijs': "Aan de slag met AI van Google in het basis- en middelbaar onderwijs"
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Hero Section */}
+        <section className="py-12 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-8 md:p-12 overflow-hidden shadow-xl">
+              <div className="relative">
+                <nav className="text-sm text-gray-400 mb-6 flex items-center gap-2 flex-wrap">
+                  <Link href="/" className="hover:text-white transition">Home</Link>
+                  <span>/</span>
+                  <Link href="/tutorials" className="hover:text-white transition">Tutorials</Link>
+                  <span>/</span>
+                  <Link 
+                    href="/tutorials/google-online-trainingen" 
+                    className="hover:text-white transition"
+                  >
+                    Google - Online trainingen
+                  </Link>
+                </nav>
+
+                <Link 
+                  href="/tutorials/google-online-trainingen" 
+                  className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Alle Google trainingen</span>
+                </Link>
+                
+                <div className="inline-flex items-center gap-2 bg-brand-red/90 text-white px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+                  <BookOpen className="w-4 h-4" />
+                  Google - Online trainingen
+                </div>
+                
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{trainingTitles[slug]}</h1>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Content sectie */}
+        <section className="py-8 px-4">
+          <div className="max-w-4xl mx-auto">
+            <GoogleTrainingDetail slug={slug} />
+          </div>
+        </section>
+
+        {/* Footer navigatie */}
+        <section className="py-8 px-4">
+          <div className="max-w-4xl mx-auto">
+            <Link 
+              href="/tutorials/google-online-trainingen"
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-brand-red font-medium transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Alle Google trainingen</span>
+            </Link>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   if (!tutorial) {
     return (
@@ -83,6 +173,17 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
                       AI Bewustzijn
                     </Link>
                   </>
+                ) : isGoogleTraining ? (
+                  <>
+                    <Link href="/tutorials" className="hover:text-white transition">Tutorials</Link>
+                    <span>/</span>
+                    <Link 
+                      href="/tutorials/google-online-trainingen" 
+                      className="hover:text-white transition"
+                    >
+                      Google - Online trainingen
+                    </Link>
+                  </>
                 ) : (
                   <>
                     <Link href="/tutorials" className="hover:text-white transition">Tutorials</Link>
@@ -102,11 +203,23 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
               </nav>
 
               <Link 
-                href={leerpadSlug ? `/leerpaden/${leerpadSlug}` : '/tutorials'} 
+                href={
+                  leerpadSlug 
+                    ? `/leerpaden/${leerpadSlug}` 
+                    : isGoogleTraining 
+                      ? '/tutorials/google-online-trainingen'
+                      : '/tutorials'
+                } 
                 className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>{leerpadSlug ? 'Terug naar het leerpad' : 'Alle tutorials'}</span>
+                <span>
+                  {leerpadSlug 
+                    ? 'Terug naar het leerpad' 
+                    : isGoogleTraining 
+                      ? 'Alle Google trainingen'
+                      : 'Alle tutorials'}
+                </span>
               </Link>
               
               {tutorial.category && (
@@ -128,11 +241,24 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
       {/* Content sectie - wit */}
       <section className="py-8 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm">
-            <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-brand-red prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700">
-              {tutorial.body && <CustomPortableText value={tutorial.body} />}
+          {/* Speciale weergave voor Google Online Trainingen hub */}
+          {slug === 'google-online-trainingen' ? (
+            <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm">
+              <p className="text-gray-600 text-lg mb-6">
+                Google biedt kosteloze online trainingen aan voor docenten. Deze trainingen helpen je om je digitale vaardigheden te verbeteren en het maximale uit Google Workspace for Education te halen.
+              </p>
+              <GoogleTrainingenHub />
             </div>
-          </div>
+          ) : isGoogleTraining ? (
+            /* Fallback voor Google training subtutorials (werkt ook zonder Sanity document) */
+            <GoogleTrainingDetail slug={slug} />
+          ) : (
+            <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm">
+              <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-brand-red prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700">
+                {tutorial.body && <CustomPortableText value={tutorial.body} />}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -164,11 +290,23 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
       <section className="py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <Link 
-            href={leerpadSlug ? `/leerpaden/${leerpadSlug}` : '/tutorials'} 
+            href={
+              leerpadSlug 
+                ? `/leerpaden/${leerpadSlug}` 
+                : isGoogleTraining 
+                  ? '/tutorials/google-online-trainingen'
+                  : '/tutorials'
+            }
             className="inline-flex items-center gap-2 text-gray-600 hover:text-brand-red font-medium transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{leerpadSlug ? 'Terug naar het leerpad' : 'Terug naar alle tutorials'}</span>
+            <span>
+              {leerpadSlug 
+                ? 'Terug naar het leerpad' 
+                : isGoogleTraining 
+                  ? 'Alle Google trainingen'
+                  : 'Terug naar alle tutorials'}
+            </span>
           </Link>
         </div>
       </section>

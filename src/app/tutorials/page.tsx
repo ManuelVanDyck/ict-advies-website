@@ -30,7 +30,7 @@ export default async function TutorialsPage({
   const params = await searchParams;
   const selectedCategory = params.categorie || null;
   
-  // Haal alle categorieën op (count alleen gepubliceerde tutorials, geen subtutorials, GEEN leerpad modules)
+  // Haal alle categorieën op (count alleen gepubliceerde tutorials, geen subtutorials, GEEN leerpad modules
   const categories = await client.fetch(`
     *[_type == "category"] | order(title asc) {
       _id,
@@ -40,6 +40,14 @@ export default async function TutorialsPage({
       "count": count(*[_type == "tutorial" && references(^._id) && (status == "published" || !defined(status)) && isSubtutorial != true && !(title match "Module *")])
     }
   `);
+  
+  // Override count for Google - Online trainingen (8 hardcoded trainings)
+  const categoriesWithCorrectCount = categories.map((cat: any) => {
+    if (cat.slug.current === 'google-online-trainingen') {
+      return { ...cat, count: 8 };
+    }
+    return cat;
+  });
   
   // Haal tutorials op: published, geen subtutorials, GEEN leerpad modules
   let tutorials;
@@ -66,10 +74,10 @@ export default async function TutorialsPage({
   }
 
   const selectedCategoryName = selectedCategory 
-    ? categories.find((c: any) => c.slug.current === selectedCategory)?.title 
+    ? categoriesWithCorrectCount.find((c: any) => c.slug.current === selectedCategory)?.title 
     : null;
 
-  const totalCount = categories.reduce((sum: number, c: any) => sum + c.count, 0);
+  const totalCount = categoriesWithCorrectCount.reduce((sum: number, c: any) => sum + c.count, 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -113,9 +121,28 @@ export default async function TutorialsPage({
               Alle ({totalCount})
             </Link>
             
-            {categories.map((cat: any) => {
+            {categoriesWithCorrectCount.map((cat: any) => {
               const Icon = categoryIcons[cat.slug.current] || Lightbulb;
               const isActive = selectedCategory === cat.slug.current;
+              const isGoogleTrainingen = cat.slug.current === 'google-online-trainingen';
+              
+              // Google - Online trainingen links to hub page instead of filter
+              if (isGoogleTrainingen) {
+                return (
+                  <Link 
+                    key={cat._id}
+                    href="/tutorials/google-online-trainingen"
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all ${
+                      isActive 
+                        ? 'bg-brand-red text-white shadow-md' 
+                        : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {cat.title} ({cat.count})
+                  </Link>
+                );
+              }
               
               return (
                 <Link 
