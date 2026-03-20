@@ -413,22 +413,41 @@ export default function AdminVoortgangPage() {
               )}
 
               {/* Details per criterium */}
-              {selectedItem.correctie_data && Object.keys(selectedItem.correctie_data).length > 0 && (
+              {selectedItem.correctie_data && (
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-3">Score per criterium</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {Object.entries(selectedItem.correctie_data).map(([key, value]) => (
-                      <div key={key} className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-                        <span className="text-sm text-gray-500 block">{key}</span>
-                        <span className={`text-xl font-bold ${
-                          value >= 7 ? 'text-green-600'
-                          : value >= 5? 'text-yellow-600'
-                          : 'text-red-600'
-                        }`}>
-                          {value}/10
-                        </span>
-                      </div>
-                    ))}
+                    {Array.isArray(selectedItem.correctie_data) 
+                      ? // Array format: [{ criterium: "naam", score: 8, feedback: "..." }]
+                        selectedItem.correctie_data.map((item: any, idx: number) => (
+                          <div key={idx} className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+                            <span className="text-sm text-gray-500 block">{item.criterium || `Criterium ${idx + 1}`}</span>
+                            <span className={`text-xl font-bold ${
+                              (item.score || 0) >= 70 ? 'text-green-600'
+                              : (item.score || 0) >= 50 ? 'text-yellow-600'
+                              : 'text-red-600'
+                            }`}>
+                              {item.score || 0}/100
+                            </span>
+                            {item.feedback && (
+                              <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.feedback}</p>
+                            )}
+                          </div>
+                        ))
+                      : // Object format: { "criterium1": 8, "criterium2": 7 }
+                        Object.entries(selectedItem.correctie_data).map(([key, value]) => (
+                          <div key={key} className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+                            <span className="text-sm text-gray-500 block">{key}</span>
+                            <span className={`text-xl font-bold ${
+                              (typeof value === 'number' ? value : 0) >= 7 ? 'text-green-600'
+                              : (typeof value === 'number' ? value : 0) >= 5 ? 'text-yellow-600'
+                              : 'text-red-600'
+                            }`}>
+                              {typeof value === 'number' ? `${value}/10` : '-'}
+                            </span>
+                          </div>
+                        ))
+                    }
                   </div>
                 </div>
               )}
