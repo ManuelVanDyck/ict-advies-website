@@ -36,11 +36,11 @@ export async function GET(request: NextRequest) {
     const [voortgangResult, inzendingenResult] = await Promise.all([
       supabase
         .from('opdracht_voortgang')
-        .select('*')
+        .select('id, user_name, user_email, tutorial_slug, opdracht_titel, antwoorden, score, feedback, correctie_data, status, created_at, completed_at')
         .order('created_at', { ascending: false }),
       supabase
         .from('opdracht_inzendingen')
-        .select('*')
+        .select('id, user_name, user_email, tutorial_slug, opdracht_titel, antwoorden, score, feedback, correctie_data, status, created_at, completed_at')
         .order('created_at', { ascending: false }),
     ]);
 
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
 
     let query = supabase
       .from('opdracht_voortgang')
-      .select('*')
+      .select('id, user_name, user_email, tutorial_slug, opdracht_titel, score, status, created_at')
       .order('created_at', { ascending: false });
 
     if (tutorial_id) {

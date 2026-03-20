@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Download, Filter, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { Download, Filter, CheckCircle2, Clock, AlertCircle, X, Eye } from 'lucide-react';
 
 interface OpdrachtVoortgang {
   id: string;
@@ -10,8 +10,10 @@ interface OpdrachtVoortgang {
   user_email: string;
   tutorial_slug: string;
   opdracht_titel: string;
+  antwoorden?: Record<string, string>;
   score?: number;
   feedback?: string;
+  correctie_data?: Record<string, number>;
   status: 'niet_begonnen' | 'bezig' | 'ingediend' | 'gekeurd' | 'voltooid';
   created_at: string;
   completed_at?: string;
@@ -22,6 +24,7 @@ export default function AdminVoortgangPage() {
   const [voortgang, setVoortgang] = useState<OpdrachtVoortgang[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState(true);
+  const [selectedItem, setSelectedItem] = useState<OpdrachtVoortgang | null>(null);
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -52,6 +55,13 @@ export default function AdminVoortgangPage() {
       setLoading(false);
     }
   };
+
+  // Re-fetch when filter changes
+  useEffect(() => {
+    if (status === 'authenticated' && !loading) {
+      fetchVoortgang();
+    }
+  }, [filter]);
 
   const handleExportCSV = async () => {
     try {
@@ -242,7 +252,11 @@ export default function AdminVoortgangPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {voortgang.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
+                <tr 
+                  key={item.id} 
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setSelectedItem(item)}
+                >
                   <td className="px-6 py-4">
                     <div>
                       <div className="font-medium text-gray-900">{item.user_name}</div>
@@ -279,11 +293,23 @@ export default function AdminVoortgangPage() {
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {new Date(item.created_at).toLocaleDateString('nl-BE')}
                   </td>
+                  <td className="px-6 py-4">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedItem(item);
+                      }}
+                      className="p-2 text-gray-400 hover:text-brand-green transition-colors"
+                      title="Bekijk details"
+                    >
+                      <Eye className="w-5 h-5" />
+                    </button>
+                  </td>
                 </tr>
               ))}
               {voortgang.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                     Geen resultaten gevonden
                   </td>
                 </tr>
@@ -292,6 +318,138 @@ export default function AdminVoortgangPage() {
           </table>
         </div>
       </div>
+
+      {/* Detail Modal */}
+      {selectedItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900">Inzending Details</h3>
+              <button
+                onClick={() => setSelectedItem(null)}
+                className="p-2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* User Info */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-sm text-gray-500">Naam</span>
+                    <p className="font-semibold text-gray-900">{selectedItem.user_name}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">Email</span>
+                    <p className="font-semibold text-gray-900">{selectedItem.user_email}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Opdracht Info */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-sm text-gray-500">Opdracht</span>
+                    <p className="font-semibold text-gray-900">{selectedItem.opdracht_titel}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">Module</span>
+                    <p className="font-semibold text-gray-900">{selectedItem.tutorial_slug}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Score & Status */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                  <span className="text-sm text-gray-500">Score</span>
+                  <p className={`text-3xl font-bold ${
+                    selectedItem.score !== undefined
+                      ? selectedItem.score >= 70 ? 'text-green-600'
+                        : selectedItem.score >= 50 ? 'text-yellow-600'
+                        : 'text-red-600'
+                      : 'text-gray-400'
+                  }`}>
+                    {selectedItem.score !== undefined ? `${selectedItem.score}/100` : '-'}
+                  </p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                  <span className="text-sm text-gray-500">Status</span>
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    {getStatusIcon(selectedItem.status)}
+                    <span className={getStatusBadge(selectedItem.status)}>
+                      {selectedItem.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Antwoorden */}
+              {selectedItem.antwoorden && Object.keys(selectedItem.antwoorden).length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Antwoorden</h4>
+                  <div className="space-y-4">
+                    {Object.entries(selectedItem.antwoorden).map(([key, value]) => (
+                      <div key={key} className="bg-white border border-gray-200 rounded-lg p-4">
+                        <h5 className="font-medium text-gray-800 mb-2">{key}</h5>
+                        <p className="text-gray-700 whitespace-pre-wrap">{value || '-'}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Feedback */}
+              {selectedItem.feedback && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">AI Feedback</h4>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-gray-700 whitespace-pre-wrap">{selectedItem.feedback}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Details per criterium */}
+              {selectedItem.correctie_data && Object.keys(selectedItem.correctie_data).length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Score per criterium</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {Object.entries(selectedItem.correctie_data).map(([key, value]) => (
+                      <div key={key} className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+                        <span className="text-sm text-gray-500 block">{key}</span>
+                        <span className={`text-xl font-bold ${
+                          value >= 7 ? 'text-green-600'
+                          : value >= 5? 'text-yellow-600'
+                          : 'text-red-600'
+                        }`}>
+                          {value}/10
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Timestamps */}
+              <div className="text-sm text-gray-500 pt-4 border-t border-gray-200">
+                <p>Aangemaakt: {new Date(selectedItem.created_at).toLocaleString('nl-BE', { 
+                  dateStyle: 'short', 
+                  timeStyle: 'short' 
+                })}</p>
+                {selectedItem.completed_at && (
+                  <p>Voltooid: {new Date(selectedItem.completed_at).toLocaleString('nl-BE', { 
+                    dateStyle: 'short', 
+                    timeStyle: 'short' 
+                  })}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
