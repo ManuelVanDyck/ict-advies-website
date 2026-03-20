@@ -81,7 +81,7 @@ export default function MijnVoortgangPage() {
 
   // Calculate progress
   const voltooidCount = voortgang.filter(v => v.status === 'voltooid').length;
-  const totalCount = 4; // 4 modules in AI bewustzijn
+  const totalCount = voortgang.length > 0 ? voortgang.length : 4; // Aantal unieke tutorials, fallback naar 4
   const progress = totalCount > 0 ? (voltooidCount / totalCount) * 100 : 0;
 
   if (sessionStatus === 'loading' || loading) {
@@ -118,8 +118,8 @@ export default function MijnVoortgangPage() {
       <div className="bg-gradient-to-br from-brand-green to-green-600 rounded-lg p-6 text-white mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold mb-1">AI Bewustzijn</h2>
-            <p className="text-white/90">4 verplichte opdrachten</p>
+            <h2 className="text-2xl font-bold mb-1">Jouw Voortgang</h2>
+            <p className="text-white/90">{totalCount} {totalCount === 1 ? 'opdracht' : 'opdrachten'}</p>
           </div>
           <div className="text-right">
             <div className="text-4xl font-bold">{Math.round(progress)}%</div>
@@ -133,7 +133,7 @@ export default function MijnVoortgangPage() {
           />
         </div>
         <div className="mt-3 text-sm text-white/90">
-          {voltooidCount} van {totalCount} opdrachten voltooid
+          {voltooidCount} van {totalCount} {totalCount === 1 ? 'opdracht' : 'opdrachten'} voltooid
         </div>
       </div>
 

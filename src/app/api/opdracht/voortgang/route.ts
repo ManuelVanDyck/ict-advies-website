@@ -53,15 +53,26 @@ export async function GET(request: NextRequest) {
       opdracht_titel: item.opdracht_titel,
     }));
 
-    // Merge en deduplicate op basis van tutorial_slug (laatste versie wint)
+    // Merge alle inzendingen
     const allVoortgang = [...voortgang, ...inzendingen];
     
-    // Sorteer op created_at
+    // Sorteer op created_at (nieuwste eerst)
     allVoortgang.sort((a, b) => 
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
-    return NextResponse.json({ voortgang: allVoortgang });
+    // Deduplicate: behoud alleen de laatste inzending per tutorial_slug
+    const seenSlugs = new Set<string>();
+    const uniqueVoortgang = allVoortgang.filter((item: any) => {
+      const slug = item.tutorial_slug;
+      if (seenSlugs.has(slug)) {
+        return false; // Al gezien, skip deze
+      }
+      seenSlugs.add(slug);
+      return true;
+    });
+
+    return NextResponse.json({ voortgang: uniqueVoortgang });
   } catch (error) {
     console.error('Error in /api/opdracht/voortgang:', error);
     return NextResponse.json(
