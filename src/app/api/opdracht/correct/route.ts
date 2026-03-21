@@ -315,13 +315,22 @@ VERMIJD:
 - De woorden "leerling" of "de cursist" - spreek direct aan met "je"`;
 }
 
-// Analyze screenshots using Ollama vision model (llava)
+// Analyze screenshots - use Claude Vision on Vercel, Ollama locally
 async function correctWithScreenshots(
   screenshots: string[],
   criteria: Criterium[],
   maxScore: number
 ): Promise<{ score: number; feedback: string; details: Record<string, number> }> {
-  console.log('[Correctie] Screenshots analyseren via Ollama llava:7b...');
+  const isLocalhost = process.env.NODE_ENV === 'development';
+  
+  // On Vercel, use Claude Vision
+  if (!isLocalhost) {
+    console.log('[Correctie] Screenshots analyseren via Claude Vision (productie)...');
+    return correctWithClaudeVision(screenshots, criteria, maxScore);
+  }
+  
+  // Locally, use Ollama llava:7b
+  console.log('[Correctie] Screenshots analyseren via Ollama llava:7b (lokaal)...');
 
   // Build criteria text with verwacht and controleer
   const criteriaText = criteria
@@ -455,6 +464,100 @@ REGELS:
     score: Math.min(score, maxScore),
     feedback: feedback,
     details: details,
+  };
+}
+
+// Claude Vision for screenshots (used on Vercel)
+async function correctWithClaudeVision(
+  screenshots: string[],
+  criteria: Criterium[],
+  maxScore: number
+): Promise<{ score: number; feedback: string; details: Record<string, number> }> {
+  const claudeApiKey = process.env.ANTHROPIC_API_KEY;
+  
+  if (!claudeApiKey) {
+    throw new Error('ANTHROPIC_API_KEY is not set');
+  }
+
+  console.log('[Correctie] Claude Vision aanroepen voor screenshots...');
+
+  // Build criteria prompt
+  const criteriaList = criteria.map((c, i) => {
+    let text = `${i + 1}. ${c.naam}`;
+    if (c.beschrijving) text += ` - ${c.beschrijving}`;
+    return text;
+  }).join('\n');
+
+  const prompt = `Je bent een trainer die opdrachten beoordeelt. Bekijk de screenshot(s) en beoordeel op basis van deze criteria:
+
+CRITERIA:
+${criteriaList}
+
+Geef je beoordeling terug als JSON:
+{
+  "score": <totaal uit ${maxScore}>,
+  "feedback": "<persoonlijke feedback in het Nederlands, spreek aan met 'je'>",
+  "details": {
+    "${criteria[0]?.naam || 'criterium1'}": <score 0-100>,
+    "${criteria[1]?.naam || 'criterium2'}": <score 0-100>,
+    "${criteria[2]?.naam || 'criterium3'}": <score 0-100>
+  }
+}`;
+
+  // Build content array with text and images
+  const content: any[] = [{ type: 'text', text: prompt }];
+  
+  // Add images
+  screenshots.forEach(img => {
+    const base64Match = img.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (base64Match) {
+      content.push({
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: `image/${base64Match[1]}`,
+          data: base64Match[2],
+        },
+      });
+    }
+  });
+
+  const response = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': claudeApiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2048,
+      messages: [{ role: 'user', content: content }],
+    }),
+  }, 120000);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Claude API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  const responseText = data.content[0].text;
+
+  console.log('[Correctie] Claude Vision response:', responseText.substring(0, 300));
+
+  // Parse JSON from response
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('No JSON found in Claude response');
+  }
+
+  const result = JSON.parse(jsonMatch[0]);
+  
+  return {
+    score: Math.min(result.score || 0, maxScore),
+    feedback: result.feedback || 'Geen feedback beschikbaar.',
+    details: result.details || {},
   };
 }
 
