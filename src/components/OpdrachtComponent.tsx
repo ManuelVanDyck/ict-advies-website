@@ -506,20 +506,26 @@ export default function OpdrachtComponent({
                 {result.details && typeof result.details === 'object' && Object.keys(result.details).length > 0 && (
                   <div className="bg-white/10 rounded-lg p-4 mb-4">
                     <h4 className="font-semibold text-white mb-3">Scores per criterium:</h4>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {Object.entries(result.details).map(([criterium, score]) => {
                         const numScore = typeof score === 'number' ? score : 0;
+                        // Score kan 0-10 of 0-100 zijn, normaliseer naar 0-100
+                        const normalizedScore = numScore > 10 ? numScore : numScore * 10;
                         return (
-                          <div key={criterium} className="flex justify-between items-center">
-                            <span className="text-gray-300">{criterium}</span>
-                            <div className="flex items-center gap-2">
-                              <div className="w-32 bg-white/20 rounded-full h-2">
-                                <div
-                                  className="bg-brand-orange h-2 rounded-full"
-                                  style={{ width: `${numScore * 10}%` }}
-                                />
-                              </div>
-                              <span className="font-medium text-white w-12 text-right">{numScore}/10</span>
+                          <div key={criterium}>
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-gray-300">{criterium}</span>
+                              <span className="font-medium text-white">{normalizedScore}/100</span>
+                            </div>
+                            <div className="w-full bg-white/20 rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full ${
+                                  normalizedScore >= 70 ? 'bg-green-500' :
+                                  normalizedScore >= 50 ? 'bg-yellow-500' :
+                                  'bg-red-500'
+                                }`}
+                                style={{ width: `${normalizedScore}%` }}
+                              />
                             </div>
                           </div>
                         );
