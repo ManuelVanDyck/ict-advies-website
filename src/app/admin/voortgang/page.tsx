@@ -95,6 +95,11 @@ export default function AdminVoortgangPage() {
       .join(' ');
   };
 
+  // Totaal aantal modules per leerpad
+  const LEERPAD_MODULE_COUNT: Record<string, number> = {
+    'ai-bewustzijn': 5,
+  };
+
   // Group data by user, then by leerpad
   const groupedData: Record<string, GebruikerData> = {};
   
@@ -114,7 +119,7 @@ export default function AdminVoortgangPage() {
         modules: [],
         gemiddeldeScore: 0,
         voltooid: 0,
-        totaal: 0
+        totaal: LEERPAD_MODULE_COUNT[leerpadSlug] || 0
       };
     }
     
@@ -124,7 +129,6 @@ export default function AdminVoortgangPage() {
   // Calculate stats per leerpad
   Object.values(groupedData).forEach(gebruiker => {
     Object.values(gebruiker.leerpaden).forEach(leerpad => {
-      leerpad.totaal = leerpad.modules.length;
       leerpad.voltooid = leerpad.modules.filter(m => m.status === 'voltooid' || m.status === 'gekeurd').length;
       
       const scoresMetScore = leerpad.modules.filter(m => m.score !== undefined);

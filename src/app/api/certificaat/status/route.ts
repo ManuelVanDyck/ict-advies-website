@@ -26,16 +26,30 @@ export async function GET(request: NextRequest) {
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-  // Haal alle voortgang voor deze user
-  const { data, error } = await supabase
-    .from('opdracht_voortgang')
-    .select('tutorial_slug, score, voltooid, status')
-    .eq('user_email', userEmail);
+  // Haal voortgang uit BEIDE tabellen
+  const [voortgangResult, inzendingenResult] = await Promise.all([
+    supabase
+      .from('opdracht_voortgang')
+      .select('tutorial_slug, score, voltooid, status')
+      .eq('user_email', userEmail),
+    supabase
+      .from('opdracht_inzendingen')
+      .select('tutorial_slug, score, status')
+      .eq('user_email', userEmail),
+  ]);
 
-  if (error) {
-    console.error('[Certificaat] Supabase error:', error);
-    return NextResponse.json({ error: 'Database error' }, { status: 500 });
+  if (voortgangResult.error) {
+    console.error('[Certificaat] opdracht_voortgang error:', voortgangResult.error);
   }
+  if (inzendingenResult.error) {
+    console.error('[Certificaat] opdracht_inzendingen error:', inzendingenResult.error);
+  }
+
+  // Combineer data uit beide tabellen
+  const allData = [
+    ...(voortgangResult.data || []),
+    ...(inzendingenResult.data || []),
+  ];
 
   // Check alle modules
   const moduleResults: Array<{ slug: string; score: number; passed: boolean }> = [];
@@ -43,7 +57,8 @@ export async function GET(request: NextRequest) {
   let totaalScore = 0;
 
   MODULE_ORDER.forEach((slug) => {
-    const voortgang = data?.find((v: any) => v.tutorial_slug === slug);
+    // Zoek in gecombineerde data
+    const voortgang = allData.find((v: any) => v.tutorial_slug === slug);
     const score = voortgang?.score || 0;
     const passed = score >= PASSING_SCORE;
 

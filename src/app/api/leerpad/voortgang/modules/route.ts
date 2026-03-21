@@ -26,26 +26,51 @@ export async function GET(request: NextRequest) {
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-  // Haal alle voortgang voor deze user
-  const { data, error } = await supabase
-    .from('opdracht_voortgang')
-    .select('tutorial_slug, score, voltooid, status')
-    .eq('user_email', userEmail);
+  // Haal voortgang uit BEIDE tabellen
+  const [voortgangResult, inzendingenResult] = await Promise.all([
+    supabase
+      .from('opdracht_voortgang')
+      .select('tutorial_slug, score, voltooid, status')
+      .eq('user_email', userEmail),
+    supabase
+      .from('opdracht_inzendingen')
+      .select('tutorial_slug, score, status')
+      .eq('user_email', userEmail),
+  ]);
 
-  if (error) {
-    console.error('[Modules] Supabase error:', error);
-    return NextResponse.json({ error: 'Database error' }, { status: 500 });
+  if (voortgangResult.error) {
+    console.error('[Modules] opdracht_voortgang error:', voortgangResult.error);
   }
+  if (inzendingenResult.error) {
+    console.error('[Modules] opdracht_inzendingen error:', inzendingenResult.error);
+  }
+
+  // Combineer data - normaliseer naar gemeenschappelijk formaat
+  const allData: Array<{ tutorial_slug: string; score: number; voltooid: boolean; status: string }> = [
+    ...(voortgangResult.data || []).map((v: any) => ({
+      tutorial_slug: v.tutorial_slug,
+      score: v.score || 0,
+      voltooid: v.voltooid || v.status === 'voltooid',
+      status: v.status,
+    })),
+    ...(inzendingenResult.data || []).map((v: any) => ({
+      tutorial_slug: v.tutorial_slug,
+      score: v.score || 0,
+      voltooid: v.status === 'voltooid',
+      status: v.status,
+    })),
+  ];
 
   // Bouw progress map
   const moduleProgress: Record<string, { completed: boolean; score: number; unlocked: boolean; passed: boolean }> = {};
   const moduleSlugs = Object.keys(MODULE_ORDER).sort((a, b) => MODULE_ORDER[a] - MODULE_ORDER[b]);
 
   moduleSlugs.forEach((slug, index) => {
-    const voortgang = data?.find((v: any) => v.tutorial_slug === slug);
+    // Zoek voortgang in gecombineerde data
+    const voortgang = allData.find((v: any) => v.tutorial_slug === slug);
     const score = voortgang?.score || 0;
     const passed = score >= PASSING_SCORE;
-    const completed = voortgang?.voltooid || false;
+    const completed = voortgang?.voltooid || voortgang?.status === 'voltooid';
 
     // Module 1 is altijd unlocked
     // Module N is unlocked als Module N-1 passed is
@@ -53,8 +78,9 @@ export async function GET(request: NextRequest) {
 
     if (index > 0) {
       const prevSlug = moduleSlugs[index - 1];
-      const prevVoortgang = data?.find((v: any) => v.tutorial_slug === prevSlug);
-      const prevPassed = (prevVoortgang?.score || 0) >= PASSING_SCORE;
+      const prevVoortgang = allData.find((v: any) => v.tutorial_slug === prevSlug);
+      const prevScore = prevVoortgang?.score || 0;
+      const prevPassed = prevScore >= PASSING_SCORE;
       unlocked = prevPassed;
     }
 
