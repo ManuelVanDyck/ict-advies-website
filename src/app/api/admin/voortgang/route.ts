@@ -64,6 +64,12 @@ export async function GET(request: NextRequest) {
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
+    // Debug logging
+    console.log('[Admin Voortgang] voortgang count:', voortgang.length);
+    console.log('[Admin Voortgang] inzendingen count:', inzendingen.length);
+    console.log('[Admin Voortgang] total:', allVoortgang.length);
+    console.log('[Admin Voortgang] module-5 entries:', allVoortgang.filter((v: any) => v.tutorial_slug?.includes('module-5')).map((v: any) => ({ slug: v.tutorial_slug, score: v.score, status: v.status })));
+
     if (voortgangResult.error || inzendingenResult.error) {
       console.error('Errors:', voortgangResult.error, inzendingenResult.error);
     }
