@@ -109,6 +109,14 @@ export default defineType({
       description: 'Optionele deadline',
       hidden: ({ parent }) => !parent?.ingeschakeld,
     }),
+    defineField({
+      name: 'screenshotOnly',
+      title: 'Alleen screenshot upload',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Vink aan om alleen screenshot upload te tonen (geen URL of PDF opties)',
+      hidden: ({ parent }) => !parent?.ingeschakeld,
+    }),
   ],
 });
 

@@ -20,6 +20,7 @@ interface Opdracht {
   criteria: Criterium[];
   maxScore: number;
   deadline?: string;
+  screenshotOnly?: boolean;
 }
 
 interface OpdrachtComponentProps {
@@ -254,169 +255,238 @@ export default function OpdrachtComponent({
         <div className="bg-white/10 backdrop-blur rounded-xl p-4 space-y-4">
           <h4 className="font-semibold text-white">Jouw opdracht indienen:</h4>
 
-          {/* Optie 1: URL */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Optie 1: Google Sheet URL
-            </label>
-            <input
-              type="url"
-              value={sheetUrl}
-              onChange={(e) => setSheetUrl(e.target.value)}
-              placeholder="https://docs.google.com/spreadsheets/d/..."
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-brand-orange focus:border-transparent"
-              disabled={loading}
-            />
-            <p className="text-xs text-gray-400 mt-1">
-              Zorg dat de sheet publiek is: Delen → Iedereen met de link kan bekijken
-            </p>
-          </div>
+          {/* Screenshot Only Mode */}
+          {opdracht.screenshotOnly ? (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Upload screenshot
+                </label>
 
-          <div className="flex items-center gap-4 text-gray-500 text-sm">
-            <div className="flex-1 border-t border-white/10"></div>
-            <span>OF</span>
-            <div className="flex-1 border-t border-white/10"></div>
-          </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  disabled={loading}
+                />
 
-          {/* Optie 2: Screenshots */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Optie 2: Upload screenshots (max 5)
-            </label>
-            <p className="text-xs text-gray-400 mb-1">
-              Maak screenshots van elk tabblad (Data, Draaitabel 1, Draaitabel 2, etc.)
-            </p>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileSelect}
-              className="hidden"
-              disabled={loading || screenshots.length >= 5}
-            />
-
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={loading || screenshots.length >= 5}
-              className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-white/30 rounded-lg hover:border-brand-orange hover:bg-white/10 transition disabled:opacity-50 text-white"
-            >
-              <Upload className="w-5 h-5" />
-              <span>Klik om te uploaden</span>
-            </button>
-
-            {/* Preview screenshots */}
-            {screenshots.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {screenshots.map((src, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={src}
-                      alt={`Screenshot ${index + 1}`}
-                      className="w-24 h-24 object-cover rounded-lg border border-white/20"
-                    />
-                    <button
-                      onClick={() => removeScreenshot(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <p className="text-xs text-gray-400 mt-2">
-              {screenshots.length}/5 screenshots geüpload
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4 text-gray-500 text-sm">
-            <div className="flex-1 border-t border-white/10"></div>
-            <span>OF</span>
-            <div className="flex-1 border-t border-white/10"></div>
-          </div>
-
-          {/* Optie 3: PDF Upload (NIEUW!) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Optie 3: Upload PDF (opent in nieuw tabblad)
-            </label>
-            <p className="text-xs text-gray-400 mb-1">
-              Upload je uitgewerkte opdracht. De PDF opent automatisch in een nieuw tabblad.
-            </p>
-
-            <input
-              ref={pdfInputRef}
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  setPdfFile(file);
-                  // Auto-upload
-                  handlePdfUpload(file);
-                }
-              }}
-              className="hidden"
-              disabled={loading || !!pdfUrl}
-            />
-
-            <button
-              onClick={() => pdfInputRef.current?.click()}
-              disabled={loading || !!pdfUrl}
-              className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-white/30 rounded-lg hover:border-brand-green hover:bg-white/10 transition disabled:opacity-50 text-white w-full"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Bezig met uploaden...</span>
-                </>
-              ) : (
-                <>
-                  <FileText className="w-5 h-5" />
-                  <span>
-                    {pdfUrl ? 'PDF geüpload ✓' : 'Klik om PDF te uploaden'}
-                  </span>
-                </>
-              )}
-            </button>
-
-            {/* PDF preview met openen link */}
-            {pdfUrl && (
-              <div className="mt-3 p-3 bg-white/10 rounded-lg">
-                <a
-                  href={pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-brand-orange hover:text-brand-orange/80 underline transition"
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={loading}
+                  className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-white/30 rounded-lg hover:border-brand-orange hover:bg-white/10 transition disabled:opacity-50 text-white"
                 >
-                  <FileText className="w-4 h-4" />
-                  <span>PDF in nieuw tabblad bekijken</span>
-                  <X className="w-4 h-4 ml-4" />
-                </a>
-              </div>
-            )}
-          </div>
+                  <Upload className="w-5 h-5" />
+                  <span>Klik om screenshot te uploaden</span>
+                </button>
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading || (!sheetUrl && screenshots.length === 0 && !pdfUrl)}
-            className="w-full px-6 py-3 bg-brand-red text-white rounded-lg hover:bg-brand-red/90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Bezig met analyseren...</span>
-              </>
-            ) : (
-              <>
-                <Search className="w-5 h-5" />
-                <span>Indienen & Analyseren</span>
-              </>
-            )}
-          </button>
+                {/* Preview screenshot */}
+                {screenshots.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {screenshots.map((src, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={src}
+                          alt={`Screenshot ${index + 1}`}
+                          className="w-32 h-32 object-cover rounded-lg border border-white/20"
+                        />
+                        <button
+                          onClick={() => removeScreenshot(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={loading || screenshots.length === 0}
+                className="w-full px-6 py-3 bg-brand-red text-white rounded-lg hover:bg-brand-red/90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Bezig met analyseren...</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-5 h-5" />
+                    <span>Indienen & Analyseren</span>
+                  </>
+                )}
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Full Mode: URL + Screenshots + PDF */}
+              {/* Optie 1: URL */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Optie 1: Google Sheet URL
+                </label>
+                <input
+                  type="url"
+                  value={sheetUrl}
+                  onChange={(e) => setSheetUrl(e.target.value)}
+                  placeholder="https://docs.google.com/spreadsheets/d/..."
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-brand-orange focus:border-transparent"
+                  disabled={loading}
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Zorg dat de sheet publiek is: Delen → Iedereen met de link kan bekijken
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4 text-gray-500 text-sm">
+                <div className="flex-1 border-t border-white/10"></div>
+                <span>OF</span>
+                <div className="flex-1 border-t border-white/10"></div>
+              </div>
+
+              {/* Optie 2: Screenshots */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Optie 2: Upload screenshots (max 5)
+                </label>
+                <p className="text-xs text-gray-400 mb-1">
+                  Maak screenshots van elk tabblad (Data, Draaitabel 1, Draaitabel 2, etc.)
+                </p>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  disabled={loading || screenshots.length >= 5}
+                />
+
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={loading || screenshots.length >= 5}
+                  className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-white/30 rounded-lg hover:border-brand-orange hover:bg-white/10 transition disabled:opacity-50 text-white"
+                >
+                  <Upload className="w-5 h-5" />
+                  <span>Klik om te uploaden</span>
+                </button>
+
+                {/* Preview screenshots */}
+                {screenshots.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {screenshots.map((src, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={src}
+                          alt={`Screenshot ${index + 1}`}
+                          className="w-24 h-24 object-cover rounded-lg border border-white/20"
+                        />
+                        <button
+                          onClick={() => removeScreenshot(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <p className="text-xs text-gray-400 mt-2">
+                  {screenshots.length}/5 screenshots geüpload
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4 text-gray-500 text-sm">
+                <div className="flex-1 border-t border-white/10"></div>
+                <span>OF</span>
+                <div className="flex-1 border-t border-white/10"></div>
+              </div>
+
+              {/* Optie 3: PDF Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Optie 3: Upload PDF (opent in nieuw tabblad)
+                </label>
+                <p className="text-xs text-gray-400 mb-1">
+                  Upload je uitgewerkte opdracht. De PDF opent automatisch in een nieuw tabblad.
+                </p>
+
+                <input
+                  ref={pdfInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setPdfFile(file);
+                      handlePdfUpload(file);
+                    }
+                  }}
+                  className="hidden"
+                  disabled={loading || !!pdfUrl}
+                />
+
+                <button
+                  onClick={() => pdfInputRef.current?.click()}
+                  disabled={loading || !!pdfUrl}
+                  className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-white/30 rounded-lg hover:border-brand-green hover:bg-white/10 transition disabled:opacity-50 text-white w-full"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Bezig met uploaden...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="w-5 h-5" />
+                      <span>
+                        {pdfUrl ? 'PDF geüpload ✓' : 'Klik om PDF te uploaden'}
+                      </span>
+                    </>
+                  )}
+                </button>
+
+                {pdfUrl && (
+                  <div className="mt-3 p-3 bg-white/10 rounded-lg">
+                    <a
+                      href={pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-brand-orange hover:text-brand-orange/80 underline transition"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>PDF in nieuw tabblad bekijken</span>
+                      <X className="w-4 h-4 ml-4" />
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={loading || (!sheetUrl && screenshots.length === 0 && !pdfUrl)}
+                className="w-full px-6 py-3 bg-brand-red text-white rounded-lg hover:bg-brand-red/90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Bezig met analyseren...</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-5 h-5" />
+                    <span>Indienen & Analyseren</span>
+                  </>
+                )}
+              </button>
+            </>
+          )}
         </div>
 
         {/* Resultaat */}
