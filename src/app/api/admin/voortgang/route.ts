@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         .order('created_at', { ascending: false }),
       supabase
         .from('opdracht_inzendingen')
-        .select('id, user_name, user_email, tutorial_slug, opdracht_titel, sheet_url, pdf_url, screenshots, score, feedback, correctie_data, status, created_at, completed_at')
+        .select('id, user_name, user_email, tutorial_slug, opdracht_titel, sheet_url, pdf_url, score, feedback, correctie_data, status, created_at, completed_at')
         .order('created_at', { ascending: false }),
     ]);
 
@@ -63,12 +63,6 @@ export async function GET(request: NextRequest) {
     allVoortgang.sort((a: any, b: any) => 
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
-
-    // Debug logging
-    console.log('[Admin Voortgang] voortgang count:', voortgang.length);
-    console.log('[Admin Voortgang] inzendingen count:', inzendingen.length);
-    console.log('[Admin Voortgang] total:', allVoortgang.length);
-    console.log('[Admin Voortgang] module-5 entries:', allVoortgang.filter((v: any) => v.tutorial_slug?.includes('module-5')).map((v: any) => ({ slug: v.tutorial_slug, score: v.score, status: v.status })));
 
     if (voortgangResult.error || inzendingenResult.error) {
       console.error('Errors:', voortgangResult.error, inzendingenResult.error);
