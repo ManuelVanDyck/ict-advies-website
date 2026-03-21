@@ -69,7 +69,8 @@ export default function AdminVoortgangPage() {
 
   const fetchVoortgang = async () => {
     try {
-      const response = await fetch('/api/admin/voortgang');
+      // Add cache buster to force fresh data
+      const response = await fetch(`/api/admin/voortgang?t=${Date.now()}`);
       const data = await response.json();
       setVoortgang(data.voortgang || []);
     } catch (error) {
@@ -389,7 +390,14 @@ export default function AdminVoortgangPage() {
                         {expandedLeerpaden.has(leerpadKey) && (
                           <div className="px-6 py-2 pl-20 bg-white">
                             <div className="space-y-2">
-                              {leerpad.modules.map((module) => (
+                              {leerpad.modules
+                                .sort((a, b) => {
+                                  // Sort by module number (extract from slug)
+                                  const numA = parseInt(a.tutorial_slug.match(/module-(\d+)/)?.[1] || '0');
+                                  const numB = parseInt(b.tutorial_slug.match(/module-(\d+)/)?.[1] || '0');
+                                  return numA - numB;
+                                })
+                                .map((module) => (
                                 <div
                                   key={module.id}
                                   onClick={() => setSelectedItem(module)}
