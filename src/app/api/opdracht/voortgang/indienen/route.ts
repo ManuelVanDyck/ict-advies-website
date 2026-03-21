@@ -300,9 +300,10 @@ export async function POST(request: NextRequest) {
       antwoorden,
       voltooid: score !== undefined,
       score: score || null,
-      feedback: feedback || (aiError ? `AI correctie niet beschikbaar. ${aiError}` : null),
+      feedback: feedback || null,
       status: score !== undefined ? 'voltooid' : 'ingediend',
       completed_at: score !== undefined ? new Date().toISOString() : null,
+      correctie_data: details || null,
     };
 
     let saveError;
