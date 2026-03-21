@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, GraduationCap, Lock, CheckCircle2, PlayCircle } from 'lucide-react';
+import { ArrowLeft, GraduationCap, Lock, CheckCircle2 } from 'lucide-react';
 import { client } from '@/sanity/client';
 
 export const metadata: Metadata = {
@@ -52,19 +52,9 @@ export default async function LeerpadenPage() {
     *[_type == "leerpad"] | order(slug.current asc) {
       _id,
       title,
+      titel,
       slug,
-      description,
-      leerdoelstellingen,
-      voorkennis,
-      modules[]->{
-        _id,
-        title,
-        slug,
-        opdracht {
-          ingeschakeld,
-          verplicht
-        }
-      }
+      description
     }
   `);
 
@@ -110,84 +100,30 @@ export default async function LeerpadenPage() {
                   key={leerpad._id}
                   className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
                       <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {leerpad.title || leerpad.slug?.current}
+                        {leerpad.title || leerpad.titel || leerpad.slug?.current}
                       </h3>
                       {leerpad.description && (
                         <p className="text-gray-600">{leerpad.description}</p>
                       )}
                     </div>
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium flex-shrink-0">
                       <CheckCircle2 className="w-4 h-4" />
                       Beschikbaar
                     </span>
                   </div>
 
-                  {/* Leerdoelstellingen */}
-                  {leerpad.leerdoelstellingen && leerpad.leerdoelstellingen.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-gray-800 mb-2">Leerdoelstellingen</h4>
-                      <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                        {leerpad.leerdoelstellingen.map((ld: string, idx: number) => (
-                          <li key={idx}>{ld}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Voorkennis */}
-                  {leerpad.voorkennis && leerpad.voorkennis.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-gray-800 mb-2">Voorkennis</h4>
-                      <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                        {leerpad.voorkennis.map((vk: string, idx: number) => (
-                          <li key={idx}>{vk}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Modules info */}
-                  {leerpad.modules && leerpad.modules.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-gray-800 mb-2">
-                        Modules ({leerpad.modules.length})
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {leerpad.modules.map((module: any, idx: number) => (
-                          <div
-                            key={module._id}
-                            className="bg-gray-50 rounded-lg p-3 border border-gray-200"
-                          >
-                            <div className="flex items-center gap-2 mb-1">
-                              <PlayCircle className="w-4 h-4 text-brand-orange" />
-                              <span className="font-medium text-sm text-gray-900">
-                                Module {idx + 1}
-                              </span>
-                            </div>
-                            <p className="text-sm text-gray-600 line-clamp-1">
-                              {module.title}
-                            </p>
-                            {module.opdracht?.verplicht && (
-                              <span className="inline-block mt-2 text-xs bg-brand-red/10 text-brand-red px-2 py-0.5 rounded">
-                                Verplicht
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <Link
-                    href={`/leerpaden/${leerpad.slug?.current}`}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
-                  >
-                    Start leerpad
-                    <ArrowLeft className="w-4 h-4 rotate-180" />
-                  </Link>
+                  <div className="mt-6">
+                    <Link
+                      href={`/leerpaden/${leerpad.slug?.current}`}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                    >
+                      Start leerpad
+                      <ArrowLeft className="w-4 h-4 rotate-180" />
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
@@ -212,7 +148,7 @@ export default async function LeerpadenPage() {
                   <div className="flex items-center gap-3 mb-3">
                     <Lock className="w-5 h-5 text-gray-400" />
                     <h3 className="font-semibold text-gray-900">
-                      {leerpad.title || leerpad.slug?.current}
+                      {leerpad.title || leerpad.titel || leerpad.slug?.current}
                     </h3>
                   </div>
                   <p className="text-sm text-gray-500">
