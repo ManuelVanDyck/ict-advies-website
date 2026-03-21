@@ -37,7 +37,8 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
         criteria,
         maxScore,
         deadline,
-        verplicht
+        verplicht,
+        screenshotOnly
       }
     }
   `, { slug });
@@ -266,8 +267,15 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
       {hasOpdracht && (
         <section className="py-8 px-4">
           <div className="max-w-4xl mx-auto">
-            {/* AI bewustzijn tutorials (AI Tools categorie + Module titel) gebruiken OpdrachtTekstComponent */}
-            {tutorial.category?.slug?.current === 'ai-tools' && tutorial.title.includes('Module') ? (
+            {/* Screenshot-only opdrachten gebruiken OpdrachtComponent */}
+            {tutorial.opdracht?.screenshotOnly ? (
+              <OpdrachtComponent
+                opdracht={tutorial.opdracht}
+                tutorialId={tutorial._id}
+                tutorialSlug={slug}
+              />
+            ) : tutorial.category?.slug?.current === 'ai-tools' && tutorial.title.includes('Module') ? (
+              /* AI bewustzijn tutorials met tekst-antwoorden gebruiken OpdrachtTekstComponent */
               <OpdrachtTekstClient
                 opdracht={tutorial.opdracht}
                 tutorialId={tutorial._id}
