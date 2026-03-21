@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, GraduationCap, CheckCircle2, PlayCircle, BookOpen, Lightbulb } from 'lucide-react';
 import { client } from '@/sanity/client';
 import LeerpadModules from '@/components/LeerpadModules';
+import CertificaatDownload from '@/components/CertificaatDownload';
 
 export default async function LeerpadDetailPage({
   params,
@@ -158,6 +159,11 @@ export default async function LeerpadDetailPage({
 
               <LeerpadModules modules={leerpad.modules} />
             </div>
+          )}
+
+          {/* Certificaat - alleen voor AI Bewustzijn */}
+          {slug === 'ai-bewustzijn' && (
+            <CertificaatDownload />
           )}
 
           {/* Mijn voortgang link */}
