@@ -123,7 +123,20 @@ export default function AdminVoortgangPage() {
       };
     }
     
-    groupedData[item.user_email].leerpaden[leerpadSlug].modules.push(item);
+    // Check of deze module al bestaat (neem hoogste score)
+    const existingIndex = groupedData[item.user_email].leerpaden[leerpadSlug].modules.findIndex(
+      m => m.tutorial_slug === item.tutorial_slug
+    );
+    
+    if (existingIndex >= 0) {
+      // Alleen vervangen als nieuwe score hoger is
+      const existing = groupedData[item.user_email].leerpaden[leerpadSlug].modules[existingIndex];
+      if ((item.score || 0) > (existing.score || 0)) {
+        groupedData[item.user_email].leerpaden[leerpadSlug].modules[existingIndex] = item;
+      }
+    } else {
+      groupedData[item.user_email].leerpaden[leerpadSlug].modules.push(item);
+    }
   });
 
   // Calculate stats per leerpad
