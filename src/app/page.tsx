@@ -75,8 +75,9 @@ export default async function Home() {
               
               {/* Subtext */}
               <p className="text-gray-300 text-base md:text-lg mb-8 max-w-2xl leading-relaxed">
-                Praktische handleidingen en tips voor Clevertouch, Google Workspace, 
-                AI tools en meer — speciaal voor leerkrachten.
+                <strong>Tutorials:</strong> praktische handleidingen voor Clevertouch, Google Workspace, AI-tools en andere digitale tools voor het onderwijs.
+                <br /><br />
+                <strong>Professionalisering:</strong> volg leerpaden, ontwikkel je ICT-vaardigheden en behaal certificaten.
               </p>
               
               {/* CTA Buttons */}
