@@ -46,31 +46,43 @@ export async function GET(request: NextRequest) {
   }
 
   // Combineer data - normaliseer naar gemeenschappelijk formaat
-  const allData: Array<{ tutorial_slug: string; score: number; voltooid: boolean; status: string }> = [
-    ...(voortgangResult.data || []).map((v: any) => ({
-      tutorial_slug: v.tutorial_slug,
-      score: v.score || 0,
-      voltooid: v.voltooid || v.status === 'voltooid',
-      status: v.status,
-    })),
-    ...(inzendingenResult.data || []).map((v: any) => ({
-      tutorial_slug: v.tutorial_slug,
-      score: v.score || 0,
-      voltooid: v.status === 'voltooid',
-      status: v.status,
-    })),
-  ];
+  const slugToData: Record<string, { score: number; completed: boolean }> = {};
+
+  // Verwerk voortgang data
+  (voortgangResult.data || []).forEach((v: any) => {
+    const current = slugToData[v.tutorial_slug];
+    const newScore = v.score || 0;
+    if (!current || newScore > current.score) {
+      slugToData[v.tutorial_slug] = {
+        score: newScore,
+        completed: v.voltooid || v.status === 'voltooid',
+      };
+    }
+  });
+
+  // Verwerk inzendingen data
+  (inzendingenResult.data || []).forEach((v: any) => {
+    const current = slugToData[v.tutorial_slug];
+    const newScore = v.score || 0;
+    if (!current || newScore > current.score) {
+      slugToData[v.tutorial_slug] = {
+        score: newScore,
+        completed: v.status === 'voltooid',
+      };
+    }
+  });
+
+  console.log('[Modules] slugToData:', JSON.stringify(slugToData));
 
   // Bouw progress map
   const moduleProgress: Record<string, { completed: boolean; score: number; unlocked: boolean; passed: boolean }> = {};
   const moduleSlugs = Object.keys(MODULE_ORDER).sort((a, b) => MODULE_ORDER[a] - MODULE_ORDER[b]);
 
   moduleSlugs.forEach((slug, index) => {
-    // Zoek voortgang in gecombineerde data
-    const voortgang = allData.find((v: any) => v.tutorial_slug === slug);
-    const score = voortgang?.score || 0;
+    const data = slugToData[slug];
+    const score = data?.score || 0;
     const passed = score >= PASSING_SCORE;
-    const completed = voortgang?.voltooid || voortgang?.status === 'voltooid';
+    const completed = data?.completed || false;
 
     // Module 1 is altijd unlocked
     // Module N is unlocked als Module N-1 passed is
@@ -78,8 +90,8 @@ export async function GET(request: NextRequest) {
 
     if (index > 0) {
       const prevSlug = moduleSlugs[index - 1];
-      const prevVoortgang = allData.find((v: any) => v.tutorial_slug === prevSlug);
-      const prevScore = prevVoortgang?.score || 0;
+      const prevData = slugToData[prevSlug];
+      const prevScore = prevData?.score || 0;
       const prevPassed = prevScore >= PASSING_SCORE;
       unlocked = prevPassed;
     }

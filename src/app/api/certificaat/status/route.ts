@@ -38,6 +38,9 @@ export async function GET(request: NextRequest) {
       .eq('user_email', userEmail),
   ]);
 
+  console.log('[Certificaat] voortgang:', voortgangResult.data?.length, 'inzendingen:', inzendingenResult.data?.length);
+  console.log('[Certificaat] inzendingen data:', JSON.stringify(inzendingenResult.data));
+
   if (voortgangResult.error) {
     console.error('[Certificaat] opdracht_voortgang error:', voortgangResult.error);
   }
@@ -45,11 +48,28 @@ export async function GET(request: NextRequest) {
     console.error('[Certificaat] opdracht_inzendingen error:', inzendingenResult.error);
   }
 
-  // Combineer data uit beide tabellen
-  const allData = [
-    ...(voortgangResult.data || []),
-    ...(inzendingenResult.data || []),
-  ];
+  // Bouw een map van slug -> beste score
+  const slugToScore: Record<string, number> = {};
+
+  // Verwerk voortgang data
+  (voortgangResult.data || []).forEach((v: any) => {
+    const currentScore = slugToScore[v.tutorial_slug] || 0;
+    const newScore = v.score || 0;
+    if (newScore > currentScore) {
+      slugToScore[v.tutorial_slug] = newScore;
+    }
+  });
+
+  // Verwerk inzendingen data
+  (inzendingenResult.data || []).forEach((v: any) => {
+    const currentScore = slugToScore[v.tutorial_slug] || 0;
+    const newScore = v.score || 0;
+    if (newScore > currentScore) {
+      slugToScore[v.tutorial_slug] = newScore;
+    }
+  });
+
+  console.log('[Certificaat] slugToScore:', JSON.stringify(slugToScore));
 
   // Check alle modules
   const moduleResults: Array<{ slug: string; score: number; passed: boolean }> = [];
@@ -57,9 +77,7 @@ export async function GET(request: NextRequest) {
   let totaalScore = 0;
 
   MODULE_ORDER.forEach((slug) => {
-    // Zoek in gecombineerde data
-    const voortgang = allData.find((v: any) => v.tutorial_slug === slug);
-    const score = voortgang?.score || 0;
+    const score = slugToScore[slug] || 0;
     const passed = score >= PASSING_SCORE;
 
     if (!passed) {
