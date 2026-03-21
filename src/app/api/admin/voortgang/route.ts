@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         .order('created_at', { ascending: false }),
       supabase
         .from('opdracht_inzendingen')
-        .select('id, user_name, user_email, tutorial_slug, opdracht_titel, antwoorden, score, feedback, correctie_data, status, created_at, completed_at')
+        .select('id, user_name, user_email, tutorial_slug, opdracht_titel, sheet_url, pdf_url, screenshots, score, feedback, correctie_data, status, created_at, completed_at')
         .order('created_at', { ascending: false }),
     ]);
 

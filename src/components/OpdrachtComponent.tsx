@@ -542,6 +542,18 @@ export default function OpdrachtComponent({
                       : JSON.stringify(result.feedback, null, 2)}
                   </p>
                 </div>
+
+                {/* Link naar leerpad/certificaat */}
+                {result.score !== undefined && result.score >= 50 && (
+                  <div className="mt-4 pt-4 border-t border-white/20">
+                    <a
+                      href="/leerpaden/ai-bewustzijn"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green text-white rounded-lg hover:bg-green-600 transition font-medium"
+                    >
+                      Bekijk je voortgang & certificaat →
+                    </a>
+                  </div>
+                )}
               </>
             )}
             {result.status === 'mislukt' && (
