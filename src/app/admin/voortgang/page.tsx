@@ -2,7 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Download, Filter, CheckCircle2, Clock, AlertCircle, X, Eye } from 'lucide-react';
+import { 
+  Download, 
+  CheckCircle2, 
+  Clock, 
+  AlertCircle, 
+  X, 
+  ChevronRight, 
+  ChevronDown,
+  User,
+  BookOpen,
+  Eye
+} from 'lucide-react';
 
 interface OpdrachtVoortgang {
   id: string;
@@ -19,12 +30,28 @@ interface OpdrachtVoortgang {
   completed_at?: string;
 }
 
+interface LeerpadData {
+  modules: OpdrachtVoortgang[];
+  gemiddeldeScore: number;
+  voltooid: number;
+  totaal: number;
+}
+
+interface GebruikerData {
+  name: string;
+  email: string;
+  leerpaden: Record<string, LeerpadData>;
+}
+
 export default function AdminVoortgangPage() {
   const { data: session, status } = useSession();
   const [voortgang, setVoortgang] = useState<OpdrachtVoortgang[]>([]);
-  const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<OpdrachtVoortgang | null>(null);
+  
+  // Accordion state
+  const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
+  const [expandedLeerpaden, setExpandedLeerpaden] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -42,11 +69,7 @@ export default function AdminVoortgangPage() {
 
   const fetchVoortgang = async () => {
     try {
-      const url = filter === 'all'
-        ? '/api/admin/voortgang'
-        : `/api/admin/voortgang?status=${filter}`;
-
-      const response = await fetch(url);
+      const response = await fetch('/api/admin/voortgang');
       const data = await response.json();
       setVoortgang(data.voortgang || []);
     } catch (error) {
@@ -56,12 +79,83 @@ export default function AdminVoortgangPage() {
     }
   };
 
-  // Re-fetch when filter changes
-  useEffect(() => {
-    if (status === 'authenticated' && !loading) {
-      fetchVoortgang();
+  // Helper: extract leerpad from tutorial_slug
+  const getLeerpadFromSlug = (slug: string): string => {
+    // "ai-bewustzijn-module-1" → "ai-bewustzijn"
+    // "ander-leerpad-module-2" → "ander-leerpad"
+    const match = slug.match(/^(.+)-module-\d+$/);
+    return match ? match[1] : slug;
+  };
+
+  // Helper: format leerpad name
+  const formatLeerpadName = (slug: string): string => {
+    return slug
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Group data by user, then by leerpad
+  const groupedData: Record<string, GebruikerData> = {};
+  
+  voortgang.forEach((item) => {
+    const leerpadSlug = getLeerpadFromSlug(item.tutorial_slug);
+    
+    if (!groupedData[item.user_email]) {
+      groupedData[item.user_email] = {
+        name: item.user_name,
+        email: item.user_email,
+        leerpaden: {}
+      };
     }
-  }, [filter]);
+    
+    if (!groupedData[item.user_email].leerpaden[leerpadSlug]) {
+      groupedData[item.user_email].leerpaden[leerpadSlug] = {
+        modules: [],
+        gemiddeldeScore: 0,
+        voltooid: 0,
+        totaal: 0
+      };
+    }
+    
+    groupedData[item.user_email].leerpaden[leerpadSlug].modules.push(item);
+  });
+
+  // Calculate stats per leerpad
+  Object.values(groupedData).forEach(gebruiker => {
+    Object.values(gebruiker.leerpaden).forEach(leerpad => {
+      leerpad.totaal = leerpad.modules.length;
+      leerpad.voltooid = leerpad.modules.filter(m => m.status === 'voltooid' || m.status === 'gekeurd').length;
+      
+      const scoresMetScore = leerpad.modules.filter(m => m.score !== undefined);
+      if (scoresMetScore.length > 0) {
+        leerpad.gemiddeldeScore = Math.round(
+          scoresMetScore.reduce((sum, m) => sum + (m.score || 0), 0) / scoresMetScore.length
+        );
+      }
+    });
+  });
+
+  // Toggle accordion
+  const toggleUser = (email: string) => {
+    const newExpanded = new Set(expandedUsers);
+    if (newExpanded.has(email)) {
+      newExpanded.delete(email);
+    } else {
+      newExpanded.add(email);
+    }
+    setExpandedUsers(newExpanded);
+  };
+
+  const toggleLeerpad = (key: string) => {
+    const newExpanded = new Set(expandedLeerpaden);
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key);
+    } else {
+      newExpanded.add(key);
+    }
+    setExpandedLeerpaden(newExpanded);
+  };
 
   const handleExportCSV = async () => {
     try {
@@ -87,15 +181,14 @@ export default function AdminVoortgangPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const base = 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ';
+    const base = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ';
     switch (status) {
       case 'voltooid':
+      case 'gekeurd':
         return base + 'bg-green-100 text-green-700';
       case 'bezig':
       case 'ingediend':
         return base + 'bg-yellow-100 text-yellow-700';
-      case 'gekeurd':
-        return base + 'bg-blue-100 text-blue-700';
       default:
         return base + 'bg-gray-100 text-gray-600';
     }
@@ -114,15 +207,13 @@ export default function AdminVoortgangPage() {
     }
   };
 
-  // Stats
-  const total = voortgang.length;
-  const voltooid = voortgang.filter((v) => v.status === 'voltooid').length;
-  const bezig = voortgang.filter((v) => v.status === 'bezig' || v.status === 'ingediend').length;
-  const avgScore = voltooid > 0
-    ? Math.round(voortgang.reduce((sum, v) => sum + (v.score || 0), 0) / voltooid)
-    : 0;
+  // Global stats
+  const gebruikers = Object.values(groupedData);
+  const totalGebruikers = gebruikers.length;
+  const totalInzendingen = voortgang.length;
+  const totalVoltooid = voortgang.filter(v => v.status === 'voltooid' || v.status === 'gekeurd').length;
 
-  if (status === 'loading') {
+  if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center py-12">
@@ -160,9 +251,7 @@ export default function AdminVoortgangPage() {
         <div className="bg-white rounded-lg p-8 shadow-sm max-w-md text-center">
           <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Geen toegang</h2>
-          <p className="text-gray-600 mb-6">
-            Je hebt geen toegang tot de admin pagina.
-          </p>
+          <p className="text-gray-600 mb-6">Je hebt geen toegang tot de admin pagina.</p>
           <a
             href="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
@@ -175,49 +264,30 @@ export default function AdminVoortgangPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin: Voortgang Overzicht</h1>
-        <p className="text-gray-600">Beheer en analyseer de voortgang van alle leerkrachten.</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin: Voortgang</h1>
+        <p className="text-gray-600">Overzicht per gebruiker en leerpad</p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="text-3xl font-bold text-gray-900">{total}</div>
+          <div className="text-3xl font-bold text-gray-900">{totalGebruikers}</div>
+          <div className="text-sm text-gray-600 mt-1">Gebruikers</div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="text-3xl font-bold text-green-600">{totalVoltooid}</div>
+          <div className="text-sm text-gray-600 mt-1">Modules voltooid</div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="text-3xl font-bold text-brand-orange">{totalInzendingen}</div>
           <div className="text-sm text-gray-600 mt-1">Totaal inzendingen</div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="text-3xl font-bold text-green-600">{voltooid}</div>
-          <div className="text-sm text-gray-600 mt-1">Voltooid</div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="text-3xl font-bold text-yellow-600">{bezig}</div>
-          <div className="text-sm text-gray-600 mt-1">In uitvoering</div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="text-3xl font-bold text-brand-orange">{avgScore}</div>
-          <div className="text-sm text-gray-600 mt-1">Gemiddelde score</div>
         </div>
       </div>
 
-      {/* Filters & Actions */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-gray-600" />
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green focus:border-transparent"
-          >
-            <option value="all">Alle statussen</option>
-            <option value="voltooid">Voltooid</option>
-            <option value="bezig">Bezig</option>
-            <option value="ingediend">Ingediend</option>
-            <option value="gekeurd">Gekeurd</option>
-          </select>
-        </div>
-
+      {/* Export */}
+      <div className="flex justify-end mb-6">
         <button
           onClick={handleExportCSV}
           className="flex items-center gap-2 px-4 py-2 bg-brand-green text-white rounded-lg hover:bg-green-600 transition-colors"
@@ -227,96 +297,128 @@ export default function AdminVoortgangPage() {
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Naam
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Opdracht
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Score
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Datum
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {voortgang.map((item) => (
-                <tr 
-                  key={item.id} 
-                  className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() => setSelectedItem(item)}
-                >
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="font-medium text-gray-900">{item.user_name}</div>
-                      <div className="text-sm text-gray-500">{item.user_email}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="font-medium text-gray-900">{item.opdracht_titel}</div>
-                      <div className="text-sm text-gray-500">{item.tutorial_slug}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    {item.score !== undefined ? (
-                      <span className={`font-bold ${
-                        item.score >= 70 ? 'text-green-600' :
-                        item.score >= 50 ? 'text-yellow-600' :
-                        'text-red-600'
-                      }`}>
-                        {item.score}/100
-                      </span>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(item.status)}
-                      <span className={getStatusBadge(item.status)}>
-                        {item.status}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(item.created_at).toLocaleDateString('nl-BE')}
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedItem(item);
-                      }}
-                      className="p-2 text-gray-400 hover:text-brand-green transition-colors"
-                      title="Bekijk details"
-                    >
-                      <Eye className="w-5 h-5" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {voortgang.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                    Geen resultaten gevonden
-                  </td>
-                </tr>
+      {/* Gebruikers lijst */}
+      <div className="space-y-2">
+        {gebruikers.length === 0 ? (
+          <div className="bg-white border border-gray-200 rounded-lg p-12 text-center text-gray-500">
+            Nog geen voortgang om weer te geven
+          </div>
+        ) : (
+          gebruikers.map((gebruiker) => (
+            <div key={gebruiker.email} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              {/* Gebruiker header */}
+              <button
+                onClick={() => toggleUser(gebruiker.email)}
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  {expandedUsers.has(gebruiker.email) ? (
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  )}
+                  <User className="w-5 h-5 text-gray-500" />
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-900">{gebruiker.name}</div>
+                    <div className="text-sm text-gray-500">{gebruiker.email}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <span>{Object.keys(gebruiker.leerpaden).length} leerpaden</span>
+                </div>
+              </button>
+
+              {/* Leerpaden (expanded) */}
+              {expandedUsers.has(gebruiker.email) && (
+                <div className="border-t border-gray-200 bg-gray-50">
+                  {Object.entries(gebruiker.leerpaden).map(([leerpadSlug, leerpad]) => {
+                    const leerpadKey = `${gebruiker.email}-${leerpadSlug}`;
+                    
+                    return (
+                      <div key={leerpadSlug} className="border-b border-gray-200 last:border-b-0">
+                        {/* Leerpad header */}
+                        <button
+                          onClick={() => toggleLeerpad(leerpadKey)}
+                          className="w-full px-6 py-3 pl-14 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            {expandedLeerpaden.has(leerpadKey) ? (
+                              <ChevronDown className="w-4 h-4 text-gray-400" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-gray-400" />
+                            )}
+                            <BookOpen className="w-4 h-4 text-gray-500" />
+                            <span className="font-medium text-gray-800">
+                              {formatLeerpadName(leerpadSlug)}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 text-sm">
+                            <span className="text-gray-500">
+                              {leerpad.voltooid}/{leerpad.totaal} modules
+                            </span>
+                            {leerpad.gemiddeldeScore > 0 && (
+                              <span className={`font-medium ${
+                                leerpad.gemiddeldeScore >= 70 ? 'text-green-600' :
+                                leerpad.gemiddeldeScore >= 50 ? 'text-yellow-600' :
+                                'text-red-600'
+                              }`}>
+                                {leerpad.gemiddeldeScore}% gem.
+                              </span>
+                            )}
+                          </div>
+                        </button>
+
+                        {/* Modules (expanded) */}
+                        {expandedLeerpaden.has(leerpadKey) && (
+                          <div className="px-6 py-2 pl-20 bg-white">
+                            <div className="space-y-2">
+                              {leerpad.modules.map((module) => (
+                                <div
+                                  key={module.id}
+                                  onClick={() => setSelectedItem(module)}
+                                  className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-brand-green hover:bg-gray-50 cursor-pointer transition-colors"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    {getStatusIcon(module.status)}
+                                    <div>
+                                      <div className="font-medium text-gray-800">
+                                        {module.opdracht_titel}
+                                      </div>
+                                      <div className="text-xs text-gray-500">
+                                        {new Date(module.created_at).toLocaleDateString('nl-BE')}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    {module.score !== undefined ? (
+                                      <span className={`font-bold ${
+                                        module.score >= 70 ? 'text-green-600' :
+                                        module.score >= 50 ? 'text-yellow-600' :
+                                        'text-red-600'
+                                      }`}>
+                                        {module.score}/100
+                                      </span>
+                                    ) : (
+                                      <span className="text-gray-400">-</span>
+                                    )}
+                                    <span className={getStatusBadge(module.status)}>
+                                      {module.status}
+                                    </span>
+                                    <Eye className="w-4 h-4 text-gray-400" />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               )}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Detail Modal */}
@@ -418,8 +520,7 @@ export default function AdminVoortgangPage() {
                   <h4 className="font-semibold text-gray-900 mb-3">Score per criterium</h4>
                   <div className="space-y-4">
                     {Array.isArray(selectedItem.correctie_data) 
-                      ? // Array format: [{ criterium: "naam", score: 8, feedback: "..." }]
-                        selectedItem.correctie_data.map((item: any, idx: number) => (
+                      ? selectedItem.correctie_data.map((item: any, idx: number) => (
                           <div key={idx} className="bg-white border border-gray-200 rounded-lg p-4">
                             <div className="flex items-center justify-between mb-2">
                               <span className="font-medium text-gray-800">{item.criterium || `Criterium ${idx + 1}`}</span>
@@ -436,8 +537,7 @@ export default function AdminVoortgangPage() {
                             )}
                           </div>
                         ))
-                      : // Object format: { "criterium1": 8, "criterium2": 7 }
-                        Object.entries(selectedItem.correctie_data).map(([key, value]) => (
+                      : Object.entries(selectedItem.correctie_data).map(([key, value]) => (
                           <div key={key} className="bg-white border border-gray-200 rounded-lg p-4">
                             <div className="flex items-center justify-between mb-2">
                               <span className="font-medium text-gray-800">{key}</span>
