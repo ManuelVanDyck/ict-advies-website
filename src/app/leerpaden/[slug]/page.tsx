@@ -160,12 +160,12 @@ export default async function LeerpadDetailPage({
             </div>
           )}
 
-          {/* Mijn Voortgang link */}
+          {/* Mijn voortgang link */}
           <Link
             href="/mijn-voortgang"
             className="block bg-brand-green hover:bg-green-600 text-white rounded-xl p-6 text-center transition-colors"
           >
-            <h3 className="text-xl font-bold mb-1">Mijn Voortgang</h3>
+            <h3 className="text-xl font-bold mb-1">Mijn voortgang</h3>
             <p className="text-white/90">Bekijk je voortgang in dit leerpad</p>
           </Link>
         </div>

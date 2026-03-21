@@ -110,7 +110,7 @@ export default function MijnVoortgangPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Mijn Voortgang</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Mijn voortgang</h1>
         <p className="text-gray-600">Bekijk en beheer je voortgang in het AI Bewustzijn leerpad.</p>
       </div>
 
