@@ -95,22 +95,26 @@ export async function getLeerpadBySlug(slug: string) {
 }
 
 export async function getModuleBySlug(leerpadSlug: string, moduleSlug: string) {
-  // Eerst de module ophalen (published of zonder status)
+  // Eerst de module/tutorial ophalen (published of zonder status)
+  // Modules kunnen zowel _type "module" als "tutorial" zijn
   const moduleData = await client.fetch(
-    `*[_type == "module" && slug.current == $moduleSlug && (status == "published" || !defined(status))][0] {
+    `*[((_type == "module" || _type == "tutorial") && slug.current == $moduleSlug) && (status == "published" || !defined(status))][0] {
       _id,
-      titel,
+      _type,
+      "titel": coalesce(titel, title),
       slug,
       volgorde,
       duur,
-      beschrijving,
+      "beschrijving": coalesce(beschrijving, excerpt),
       inhoud,
+      body,
       videoUrl,
       praktijkopdracht,
       digcompeduDomein,
       aiStap,
       tools,
-      "tutorials": tutorials[]->{ _id, title, slug, excerpt }
+      "tutorials": tutorials[]->{ _id, title, slug, excerpt },
+      "opdracht": opdracht
     }`,
     { moduleSlug }
   );
@@ -124,7 +128,7 @@ export async function getModuleBySlug(leerpadSlug: string, moduleSlug: string) {
       titel,
       slug,
       profiel,
-      "modules": modules[]->{ _id, titel, slug, volgorde }
+      "modules": modules[]->{ _id, "titel": coalesce(titel, title), slug, volgorde }
     }`,
     { leerpadSlug, moduleId: moduleData._id }
   );

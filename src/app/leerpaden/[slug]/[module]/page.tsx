@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getModuleBySlug } from '@/sanity/queries';
 import { Clock, ArrowRight, ArrowLeft, BookOpen, Video, ExternalLink, CheckCircle } from 'lucide-react';
+import { PortableText } from '@portabletext/react';
+import OpdrachtClient from './OpdrachtClient';
 
 // Force dynamic rendering in development for instant updates
 export const dynamic = 'force-dynamic';
@@ -28,6 +30,7 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
   const leerpad = moduleData.leerpad;
   const vorige = moduleData.vorigeModule;
   const volgende = moduleData.volgendeModule;
+  const isTutorial = moduleData._type === 'tutorial';
 
   return (
     <div className="min-h-screen bg-[#fee4cc]">
@@ -49,10 +52,12 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
 
           <h1 className="text-3xl font-bold mb-2">{moduleData.titel}</h1>
           <div className="flex items-center gap-4 text-sm opacity-80">
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              <span>{moduleData.duur} minuten</span>
-            </div>
+            {moduleData.duur && (
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                <span>{moduleData.duur} minuten</span>
+              </div>
+            )}
             {moduleData.aiStap && (
               <span>AI Stap {moduleData.aiStap}</span>
             )}
@@ -82,15 +87,35 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
               </div>
             )}
 
-            {/* Beschrijving */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-semibold text-[#4c8077] mb-4">
-                Beschrijving
-              </h2>
-              <p className="text-gray-700">{moduleData.beschrijving}</p>
-            </div>
+            {/* Body content (for tutorials) */}
+            {isTutorial && moduleData.body && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="prose prose-lg max-w-none">
+                  <PortableText value={moduleData.body} />
+                </div>
+              </div>
+            )}
 
-            {/* Praktijkopdracht */}
+            {/* Beschrijving (for modules) */}
+            {!isTutorial && moduleData.beschrijving && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-2xl font-semibold text-[#4c8077] mb-4">
+                  Beschrijving
+                </h2>
+                <p className="text-gray-700">{moduleData.beschrijving}</p>
+              </div>
+            )}
+
+            {/* Inhoud (for modules) */}
+            {!isTutorial && moduleData.inhoud && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="prose prose-lg max-w-none">
+                  <PortableText value={moduleData.inhoud} />
+                </div>
+              </div>
+            )}
+
+            {/* Praktijkopdracht (for modules) */}
             {moduleData.praktijkopdracht && (
               <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6">
                 <h3 className="text-xl font-semibold text-yellow-800 mb-3 flex items-center gap-2">
@@ -99,6 +124,15 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
                 </h3>
                 <p className="text-gray-700">{moduleData.praktijkopdracht}</p>
               </div>
+            )}
+
+            {/* Opdracht (for tutorials) */}
+            {isTutorial && moduleData.opdracht?.ingeschakeld && (
+              <OpdrachtClient 
+                opdracht={moduleData.opdracht}
+                tutorialId={moduleData._id}
+                tutorialSlug={moduleData.slug?.current || moduleSlug}
+              />
             )}
 
             {/* Navigation */}
@@ -189,7 +223,7 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
             {/* Progress info */}
             <div className="bg-gray-100 rounded-lg p-6">
               <p className="text-sm text-gray-600">
-                Module {moduleData.volgorde}
+                Module {moduleData.volgorde || '?'}
               </p>
               <p className="text-xs text-gray-500 mt-2">
                 Log in om je voortgang bij te houden.
