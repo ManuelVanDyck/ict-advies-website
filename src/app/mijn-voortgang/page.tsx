@@ -12,8 +12,10 @@ import {
   Award,
   PlayCircle,
   TrendingUp,
-  X
+  X,
+  Download
 } from 'lucide-react';
+import { generateCertificaatPDF } from '@/lib/pdf/certificaat-pdf';
 
 interface OpdrachtVoortgang {
   id: string;
@@ -48,6 +50,14 @@ const LEERPAD_MODULE_COUNT: Record<string, number> = {
 
 const LEERPAD_NAMES: Record<string, string> = {
   'ai-bewustzijn': 'AI Bewustzijn',
+};
+
+const MODULE_TITELS: Record<string, string> = {
+  'ai-bewustzijn-module-1': 'Visievorming – De mens aan het roer',
+  'ai-bewustzijn-module-2': 'Betrouwbaarheid toetsen',
+  'ai-bewustzijn-module-3': 'Het didactische proces (6 stappen)',
+  'ai-bewustzijn-module-4': 'Professionalisering & netwerk',
+  'ai-bewustzijn-module-5': 'Google AI Training',
 };
 
 export default function MijnVoortgangPage() {
@@ -193,6 +203,39 @@ export default function MijnVoortgangPage() {
   const totalVoltooid = voortgang.filter(v => v.status === 'voltooid' || v.status === 'gekeurd').length;
   const hasCertificaat = certificaatStatus?.allPassed || false;
 
+  const handleDownloadCertificaat = () => {
+    if (!certificaatStatus || !session?.user) return;
+
+    const modules = certificaatStatus.modules.map((m) => ({
+      titel: MODULE_TITELS[m.slug] || m.slug,
+      score: m.score,
+    }));
+
+    const blob = generateCertificaatPDF({
+      userName: session.user.name || session.user.email || 'Onbekend',
+      userEmail: session.user.email || '',
+      leerpadTitel: 'AI Bewustzijn',
+      modules,
+      totaalScore: certificaatStatus.gemiddeldeScore,
+      datum: new Date().toLocaleDateString('nl-BE', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
+      directieNaam: 'Nathalie Vanden Bossche',
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `certificaat-ai-bewustzijn-${Date.now()}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   if (sessionStatus === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -281,12 +324,13 @@ export default function MijnVoortgangPage() {
                     <div className="text-amber-700">AI Bewustzijn — Gemiddelde score: {certificaatStatus?.gemiddeldeScore}%</div>
                   </div>
                 </div>
-                <a
-                  href="/leerpaden/ai-bewustzijn?certificaat=1"
+                <button
+                  onClick={handleDownloadCertificaat}
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white rounded-lg font-semibold hover:bg-amber-600 transition-colors"
                 >
-                  Bekijk certificaat
-                </a>
+                  <Download className="w-4 h-4" />
+                  Download certificaat
+                </button>
               </div>
             </div>
           </div>
