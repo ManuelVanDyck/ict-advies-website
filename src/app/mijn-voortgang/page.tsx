@@ -11,7 +11,8 @@ import {
   BookOpen,
   Award,
   PlayCircle,
-  TrendingUp
+  TrendingUp,
+  X
 } from 'lucide-react';
 
 interface OpdrachtVoortgang {
@@ -54,6 +55,7 @@ export default function MijnVoortgangPage() {
   const [voortgang, setVoortgang] = useState<OpdrachtVoortgang[]>([]);
   const [certificaatStatus, setCertificaatStatus] = useState<CertificaatStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedItem, setSelectedItem] = useState<OpdrachtVoortgang | null>(null);
   
   // Accordion state
   const [expandedLeerpaden, setExpandedLeerpaden] = useState<Set<string>>(new Set());
@@ -378,9 +380,9 @@ export default function MijnVoortgangPage() {
                               return numA - numB;
                             })
                             .map((module) => (
-                              <a
+                              <div
                                 key={module.id}
-                                href={`/leerpaden/${leerpadSlug}/${module.tutorial_slug}`}
+                                onClick={() => setSelectedItem(module)}
                                 className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white hover:border-brand-green hover:shadow-sm cursor-pointer transition-all"
                               >
                                 <div className="flex items-center gap-3">
@@ -410,7 +412,7 @@ export default function MijnVoortgangPage() {
                                     {module.status}
                                   </span>
                                 </div>
-                              </a>
+                              </div>
                             ))}
                         </div>
                       )}
@@ -422,6 +424,145 @@ export default function MijnVoortgangPage() {
           )}
         </div>
       </section>
+
+      {/* Detail Modal */}
+      {selectedItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900">Inzending Details</h3>
+              <button
+                onClick={() => setSelectedItem(null)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Opdracht Info */}
+              <div className="bg-gray-50 rounded-xl p-5">
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <span className="text-sm text-gray-500">Opdracht</span>
+                    <p className="font-semibold text-gray-900 mt-1">{selectedItem.opdracht_titel}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">Module</span>
+                    <p className="font-semibold text-gray-900 mt-1">{selectedItem.tutorial_slug}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Score & Status */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gray-50 rounded-xl p-5 text-center">
+                  <span className="text-sm text-gray-500">Score</span>
+                  <p className={`text-3xl font-bold mt-2 ${
+                    selectedItem.score !== undefined
+                      ? selectedItem.score >= 70 ? 'text-green-600'
+                        : selectedItem.score >= 50 ? 'text-yellow-600'
+                        : 'text-red-600'
+                      : 'text-gray-400'
+                  }`}>
+                    {selectedItem.score !== undefined ? `${selectedItem.score}/100` : '—'}
+                  </p>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-5 text-center">
+                  <span className="text-sm text-gray-500">Status</span>
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    {getStatusIcon(selectedItem.status)}
+                    <span className={getStatusBadge(selectedItem.status)}>
+                      {selectedItem.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Antwoorden */}
+              {selectedItem.antwoorden && Object.keys(selectedItem.antwoorden).length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Antwoorden</h4>
+                  <div className="space-y-4">
+                    {Object.entries(selectedItem.antwoorden).map(([key, value]) => (
+                      <div key={key} className="bg-gray-50 rounded-xl p-4">
+                        <h5 className="font-medium text-gray-800 mb-2">{key}</h5>
+                        <p className="text-gray-700 whitespace-pre-wrap">{value || '—'}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Feedback */}
+              {selectedItem.feedback && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">AI Feedback</h4>
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <p className="text-gray-700 whitespace-pre-wrap">{selectedItem.feedback}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Details per criterium */}
+              {selectedItem.correctie_data && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Score per criterium</h4>
+                  <div className="space-y-3">
+                    {Array.isArray(selectedItem.correctie_data) 
+                      ? selectedItem.correctie_data.map((item: any, idx: number) => (
+                          <div key={idx} className="bg-gray-50 rounded-xl p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-medium text-gray-800">{item.criterium || `Criterium ${idx + 1}`}</span>
+                              <span className={`text-lg font-bold ${
+                                (item.score || 0) >= 70 ? 'text-green-600'
+                                : (item.score || 0) >= 50 ? 'text-yellow-600'
+                                : 'text-red-600'
+                              }`}>
+                                {item.score || 0}/100
+                              </span>
+                            </div>
+                            {item.feedback && (
+                              <p className="text-sm text-gray-600 bg-white rounded-lg p-3 mt-2">{item.feedback}</p>
+                            )}
+                          </div>
+                        ))
+                      : Object.entries(selectedItem.correctie_data).map(([key, value]) => (
+                          <div key={key} className="bg-gray-50 rounded-xl p-4">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-gray-800">{key}</span>
+                              <span className={`text-lg font-bold ${
+                                (typeof value === 'number' ? value : 0) >= 7 ? 'text-green-600'
+                                : (typeof value === 'number' ? value : 0) >= 5 ? 'text-yellow-600'
+                                : 'text-red-600'
+                              }`}>
+                                {typeof value === 'number' ? `${value}/10` : '—'}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                    }
+                  </div>
+                </div>
+              )}
+
+              {/* Timestamps */}
+              <div className="text-sm text-gray-500 pt-4 border-t border-gray-100">
+                <p>Aangemaakt: {new Date(selectedItem.created_at).toLocaleString('nl-BE', { 
+                  dateStyle: 'short', 
+                  timeStyle: 'short' 
+                })}</p>
+                {selectedItem.completed_at && (
+                  <p>Voltooid: {new Date(selectedItem.completed_at).toLocaleString('nl-BE', { 
+                    dateStyle: 'short', 
+                    timeStyle: 'short' 
+                  })}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
