@@ -68,7 +68,65 @@ export async function GET(request: NextRequest) {
       console.error('Errors:', voortgangResult.error, inzendingenResult.error);
     }
 
-    return NextResponse.json({ voortgang: allVoortgang });
+    // Bereken certificaat status per gebruiker per leerpad
+    const MODULE_ORDER = [
+      'ai-bewustzijn-module-1',
+      'ai-bewustzijn-module-2',
+      'ai-bewustzijn-module-3',
+      'ai-bewustzijn-module-4',
+      'ai-bewustzijn-module-5',
+    ];
+    const PASSING_SCORE = 50;
+    const LEERPAD_MODULE_COUNT: Record<string, number> = {
+      'ai-bewustzijn': 5,
+    };
+
+    // Bouw map: gebruiker_email -> leerpad_slug -> module_slug -> hoogste score
+    const userScores: Record<string, Record<string, Record<string, number>>> = {};
+    
+    allVoortgang.forEach((item: any) => {
+      const match = item.tutorial_slug.match(/^(.+)-module-\d+$/);
+      if (!match) return;
+      const leerpadSlug = match[1];
+      
+      if (!userScores[item.user_email]) {
+        userScores[item.user_email] = {};
+      }
+      if (!userScores[item.user_email][leerpadSlug]) {
+        userScores[item.user_email][leerpadSlug] = {};
+      }
+      
+      const currentScore = userScores[item.user_email][leerpadSlug][item.tutorial_slug] || 0;
+      const newScore = item.score || 0;
+      if (newScore > currentScore) {
+        userScores[item.user_email][leerpadSlug][item.tutorial_slug] = newScore;
+      }
+    });
+
+    // Bereken certificaat status
+    const certificaten: Record<string, Record<string, boolean>> = {};
+    
+    Object.entries(userScores).forEach(([userEmail, leerpaden]) => {
+      certificaten[userEmail] = {};
+      Object.entries(leerpaden).forEach(([leerpadSlug, modules]) => {
+        const totalModules = LEERPAD_MODULE_COUNT[leerpadSlug] || 0;
+        if (totalModules === 0) return;
+        
+        // Check alle modules
+        let allPassed = true;
+        for (let i = 1; i <= totalModules; i++) {
+          const moduleSlug = `${leerpadSlug}-module-${i}`;
+          const score = modules[moduleSlug] || 0;
+          if (score < PASSING_SCORE) {
+            allPassed = false;
+            break;
+          }
+        }
+        certificaten[userEmail][leerpadSlug] = allPassed;
+      });
+    });
+
+    return NextResponse.json({ voortgang: allVoortgang, certificaten });
   } catch (error) {
     console.error('Error in /api/admin/voortgang:', error);
     return NextResponse.json(

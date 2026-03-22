@@ -12,7 +12,8 @@ import {
   ChevronDown,
   User,
   BookOpen,
-  Eye
+  Eye,
+  Award
 } from 'lucide-react';
 
 interface OpdrachtVoortgang {
@@ -46,6 +47,7 @@ interface GebruikerData {
 export default function AdminVoortgangPage() {
   const { data: session, status } = useSession();
   const [voortgang, setVoortgang] = useState<OpdrachtVoortgang[]>([]);
+  const [certificaten, setCertificaten] = useState<Record<string, Record<string, boolean>>>({});
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<OpdrachtVoortgang | null>(null);
   
@@ -73,6 +75,7 @@ export default function AdminVoortgangPage() {
       const response = await fetch(`/api/admin/voortgang?t=${Date.now()}`);
       const data = await response.json();
       setVoortgang(data.voortgang || []);
+      setCertificaten(data.certificaten || {});
     } catch (error) {
       console.error('Error fetching voortgang:', error);
     } finally {
@@ -230,6 +233,11 @@ export default function AdminVoortgangPage() {
   const totalGebruikers = gebruikers.length;
   const totalInzendingen = voortgang.length;
   const totalVoltooid = voortgang.filter(v => v.status === 'voltooid' || v.status === 'gekeurd').length;
+  
+  // Count total certificates
+  const totalCertificaten = Object.values(certificaten).reduce((sum, userCerts) => {
+    return sum + Object.values(userCerts).filter(Boolean).length;
+  }, 0);
 
   if (status === 'loading' || loading) {
     return (
@@ -289,7 +297,7 @@ export default function AdminVoortgangPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <div className="text-3xl font-bold text-gray-900">{totalGebruikers}</div>
           <div className="text-sm text-gray-600 mt-1">Gebruikers</div>
@@ -301,6 +309,10 @@ export default function AdminVoortgangPage() {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <div className="text-3xl font-bold text-brand-orange">{totalInzendingen}</div>
           <div className="text-sm text-gray-600 mt-1">Totaal inzendingen</div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="text-3xl font-bold text-amber-600">{totalCertificaten}</div>
+          <div className="text-sm text-gray-600 mt-1">Certificaten uitgegeven</div>
         </div>
       </div>
 
@@ -369,6 +381,13 @@ export default function AdminVoortgangPage() {
                             <span className="font-medium text-gray-800">
                               {formatLeerpadName(leerpadSlug)}
                             </span>
+                            {/* Certificaat badge */}
+                            {certificaten[gebruiker.email]?.[leerpadSlug] && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                <Award className="w-3 h-3" />
+                                Certificaat
+                              </span>
+                            )}
                           </div>
                           <div className="flex items-center gap-4 text-sm">
                             <span className="text-gray-500">
