@@ -1,7 +1,34 @@
 'use client';
 
 import { useState } from 'react';
-import CustomPortableText from './PortableText';
+import {
+  PortableText,
+  type PortableTextComponents,
+} from '@portabletext/react';
+import Image from 'next/image';
+import { urlFor } from '@/lib/sanityImageUrl';
+
+// Simple inline components for accordion content
+const accordionComponents: PortableTextComponents = {
+  block: {
+    h1: ({ children }) => <h1 className="text-2xl font-bold mb-3 text-gray-900">{children}</h1>,
+    h2: ({ children }) => <h2 className="text-xl font-bold mb-3 mt-6 text-gray-900">{children}</h2>,
+    h3: ({ children }) => <h3 className="text-lg font-semibold mb-2 mt-4 text-gray-900">{children}</h3>,
+    normal: ({ children }) => <p className="mb-3 leading-relaxed text-gray-700">{children}</p>,
+  },
+  marks: {
+    strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
+    em: ({ children }) => <em className="italic">{children}</em>,
+    link: ({ value, children }) => {
+      const target = (value?.href || '').startsWith('http') ? '_blank' : undefined;
+      return <a href={value?.href} target={target} rel={target === '_blank' ? 'noopener noreferrer' : undefined} className="text-brand-red hover:underline">{children}</a>;
+    },
+  },
+  list: {
+    bullet: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-1 text-gray-700">{children}</ul>,
+    number: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-1 text-gray-700">{children}</ol>,
+  },
+};
 
 interface AccordionSectionProps {
   value: {
@@ -42,7 +69,7 @@ export default function AccordionSection({ value }: AccordionSectionProps) {
       </button>
       {isOpen && (
         <div className="p-6 bg-white">
-          <CustomPortableText value={content} />
+          <PortableText value={content} components={accordionComponents} />
         </div>
       )}
     </div>
