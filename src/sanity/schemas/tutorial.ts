@@ -97,6 +97,10 @@ export default defineType({
           type: 'twoColumn',
           title: 'Twee Kolommen',
         },
+        {
+          type: 'accordionSection',
+          title: 'Openklapbare Sectie',
+        },
       ],
     }),
     defineField({

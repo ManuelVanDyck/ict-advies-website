@@ -4,6 +4,7 @@ import {
 } from '@portabletext/react';
 import Image from 'next/image';
 import { urlFor } from '@/lib/sanityImageUrl';
+import AccordionSection from './AccordionSection';
 
 // YouTube video component
 function YouTubeVideo({ value }: { value: { url?: string; caption?: string } }) {
@@ -175,6 +176,7 @@ const components: PortableTextComponents = {
     youtube: YouTubeVideo,
     pdfFile: PdfFile,
     twoColumn: TwoColumn,
+    accordionSection: AccordionSection,
     customImage: ({ value }) => {
       if (!value?.image) return null;
       

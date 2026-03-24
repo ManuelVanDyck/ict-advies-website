@@ -7,6 +7,7 @@ import quizVraag from './quizVraag';
 import opdracht, { criteriumType } from './opdracht';
 import twoColumn from './twoColumn';
 import customImage from './customImage';
+import accordionSection from './accordionSection';
 
 export const schemaTypes = [
   blockContent,
@@ -22,4 +23,5 @@ export const schemaTypes = [
   criteriumType,
   twoColumn,
   customImage,
+  accordionSection,
 ];
