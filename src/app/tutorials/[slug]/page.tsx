@@ -1,7 +1,7 @@
 import { client } from '@/sanity/client';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen } from 'lucide-react';
-import CustomPortableText from '@/components/PortableText';
+import TutorialContent from '@/components/TutorialContent';
 import OpdrachtComponent from '@/components/OpdrachtComponent';
 import OpdrachtTekstClient from '@/components/OpdrachtTekstClient';
 import GoogleTrainingenHub from '@/components/GoogleTrainingenHub';
@@ -255,9 +255,7 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
             <GoogleTrainingDetail slug={slug} />
           ) : (
             <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm">
-              <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-brand-red prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700">
-                {tutorial.body && <CustomPortableText value={tutorial.body} />}
-              </div>
+              <TutorialContent body={tutorial.body} />
             </div>
           )}
         </div>
