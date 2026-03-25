@@ -10,6 +10,65 @@ import { urlFor } from '@/lib/sanityImageUrl';
 
 // Simple inline components for accordion content
 const accordionComponents: PortableTextComponents = {
+  types: {
+    customImage: ({ value }) => {
+      if (!value?.image) return null;
+
+      const sizeConfig: Record<string, { width: number; height: number; maxWidth: string; fit?: string }> = {
+        small: { width: 400, height: 300, maxWidth: 'max-w-md' },
+        medium: { width: 600, height: 450, maxWidth: 'max-w-xl' },
+        large: { width: 800, height: 600, maxWidth: 'max-w-3xl' },
+        full: { width: 1200, height: 900, maxWidth: 'max-w-full' },
+        'fit-width': { width: 800, height: 0, maxWidth: 'max-w-3xl', fit: 'max' },
+        'fit-height': { width: 800, height: 0, maxWidth: 'max-w-3xl', fit: 'max' },
+      };
+
+      const config = sizeConfig[value.size as keyof typeof sizeConfig] || sizeConfig.large;
+
+      let imageUrlBuilder = urlFor(value.image).width(config.width);
+      if (!config.fit) {
+        imageUrlBuilder = imageUrlBuilder.height(config.height);
+      }
+      const imageUrl = imageUrlBuilder.url();
+
+      if (config.fit) {
+        return (
+          <div className={`mb-6 ${config.maxWidth} mx-auto`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imageUrl}
+              alt={value.alt || 'Afbeelding'}
+              className="rounded-lg shadow-md w-full h-auto"
+            />
+            {value.caption && <p className="text-sm text-gray-500 mt-2 text-center">{value.caption}</p>}
+          </div>
+        );
+      }
+
+      return (
+        <div className={`mb-6 ${config.maxWidth} mx-auto`}>
+          <Image
+            src={imageUrl}
+            alt={value.alt || 'Afbeelding'}
+            width={config.width}
+            height={config.height}
+            className="rounded-lg shadow-md w-full h-auto"
+            unoptimized
+          />
+          {value.caption && <p className="text-sm text-gray-500 mt-2 text-center">{value.caption}</p>}
+        </div>
+      );
+    },
+    image: ({ value }) => {
+      if (!value) return null;
+      const imageUrl = urlFor(value).width(800).height(600).url();
+      return (
+        <div className="mb-6">
+          <Image src={imageUrl} alt={value.alt || 'Afbeelding'} width={800} height={600} className="rounded-lg shadow-md w-full h-auto" unoptimized />
+        </div>
+      );
+    },
+  },
   block: {
     h1: ({ children }) => <h1 className="text-2xl font-bold mb-3 text-gray-900">{children}</h1>,
     h2: ({ children }) => <h2 className="text-xl font-bold mb-3 mt-6 text-gray-900">{children}</h2>,
