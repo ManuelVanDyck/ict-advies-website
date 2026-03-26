@@ -15,7 +15,7 @@ async function correctWithOllama(prompt: string): Promise<any> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'qwen2.5:7b',
+        model: 'qwen2.5:7b', // TODO: qwen3.5:9b is too slow due to thinking mode
         prompt: prompt,
         stream: false,
         format: 'json',
@@ -219,6 +219,7 @@ export async function POST(request: NextRequest) {
         'ai-bewustzijn-module-2': 'betrouwbaarheidsscan',
         'ai-bewustzijn-module-3': 'participatieplan',
         'ai-bewustzijn-module-4': 'evaluatieprotocol',
+        'ai-bewustzijn-module-6': 'concreet-aan-de-slag',
       };
 
       const promptOpdrachtId = opdrachtIdMap[tutorial_slug] || opdracht_id;

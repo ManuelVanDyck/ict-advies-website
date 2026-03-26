@@ -4,7 +4,7 @@ import tutorial from './tutorial';
 import leerpad from './leerpad';
 import module from './module';
 import quizVraag from './quizVraag';
-import opdracht, { criteriumType } from './opdracht';
+import opdracht, { criteriumType, multipleChoiceOptieType } from './opdracht';
 import twoColumn from './twoColumn';
 import customImage from './customImage';
 import accordionSection from './accordionSection';
@@ -21,6 +21,7 @@ export const schemaTypes = [
   pdfFile,
   opdracht,
   criteriumType,
+  multipleChoiceOptieType,
   twoColumn,
   customImage,
   accordionSection,

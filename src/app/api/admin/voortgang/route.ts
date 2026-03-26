@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
       'ai-bewustzijn-module-3',
       'ai-bewustzijn-module-4',
       'ai-bewustzijn-module-5',
+      'ai-bewustzijn-module-6',
     ];
     const PASSING_SCORE = 50;
     const LEERPAD_MODULE_COUNT: Record<string, number> = {

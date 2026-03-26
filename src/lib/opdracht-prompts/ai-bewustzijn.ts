@@ -1,10 +1,23 @@
 // AI Prompts voor AI Bewustzijn Leerpad
 // Elk opdracht heeft zijn eigen prompt template
 
+export interface MultipleChoiceOptie {
+  label: string;
+  waarde: string;
+  correct?: boolean;
+}
+
 export interface OpdrachtPromptInput {
   titel: string;
   instructie: string;
-  criteria: { naam: string; beschrijving: string; gewicht: number }[];
+  criteria: { 
+    naam: string; 
+    vraag?: string;
+    vraagType?: 'tekst' | 'multiple-choice';
+    opties?: MultipleChoiceOptie[];
+    beschrijving: string; 
+    gewicht: number;
+  }[];
   antwoorden: Record<string, any>;
 }
 
@@ -174,6 +187,62 @@ ANTWOORD ALLEEN IN JSON-formaat:
 `;
 };
 
+// Opdracht 6: Concreet aan de slag met AI
+export const promptConcreetAanDeSlang = (input: OpdrachtPromptInput): string => {
+  // Build criteria info including questions
+  const criteriaInfo = input.criteria.map(c => {
+    let info = `- ${c.naam} (${c.gewicht}%): ${c.beschrijving}`;
+    if (c.vraag) {
+      info += `\n  VRAAG: ${c.vraag}`;
+    }
+    if (c.vraagType === 'multiple-choice' && c.opties) {
+      info += '\n  OPTIES:';
+      c.opties.forEach(o => {
+        info += `\n    ${o.label} (waarde: ${o.waarde}${o.correct ? ', CORRECT' : ''})`;
+      });
+    }
+    return info;
+  }).join('\n');
+
+  return `
+Je bent een AI-educatie specialist die beoordeelt of leerkrachten de praktische toepassing van AI in het onderwijs begrijpen.
+
+OPDRACHT: ${input.titel}
+${input.instructie}
+
+BEOORDELINGSCRITERIA:
+${criteriaInfo}
+
+ANTWOORDEN VAN DE LEERKRACHT:
+${JSON.stringify(input.antwoorden, null, 2)}
+
+INSTRUCTIES:
+1. Beoordeel elk criterium op basis van de antwoorden
+2. Voor TEKST vragen (Kennis AI-tools, Begrip AI-waaier, Kwaliteit prompt):
+   - Beoordeel de inhoud, volledigheid en kwaliteit
+   - Geef een score van 0-100
+3. Voor MULTIPLE CHOICE vragen (MC: Good practices, MC: Checklist, MC: Valkuilen):
+   - Het antwoord is de waarde (A, B, C of D)
+   - Controleer of het antwoord correct is volgens de opties hierboven
+   - Score: 100 als correct, 0 als fout
+4. Bereken een gewogen totaalscore
+5. Schrijf constructieve feedback
+
+ANTWOORD ALLEEN IN JSON-formaat:
+{
+  "score": totaalscore (0-100),
+  "feedback": "korte samenvattende feedback in het Nederlands",
+  "details": [
+    {
+      "criterium": "naam van criterium",
+      "score": score (0-100),
+      "feedback": "constructieve feedback in het Nederlands"
+    }
+  ]
+}
+`;
+};
+
 // Helper: Selecteer de juiste prompt op basis van opdracht ID
 export const getPromptForOpdracht = (opdrachtId: string, input: OpdrachtPromptInput): string => {
   switch (opdrachtId) {
@@ -185,6 +254,8 @@ export const getPromptForOpdracht = (opdrachtId: string, input: OpdrachtPromptIn
       return promptParticipatieplan(input);
     case 'evaluatieprotocol':
       return promptEvaluatieprotocol(input);
+    case 'concreet-aan-de-slag':
+      return promptConcreetAanDeSlang(input);
     default:
       throw new Error(`Onbekende opdracht ID: ${opdrachtId}`);
   }

@@ -11,6 +11,7 @@ const MODULE_ORDER: Record<string, number> = {
   'ai-bewustzijn-module-3': 3,
   'ai-bewustzijn-module-4': 4,
   'ai-bewustzijn-module-5': 5,
+  'ai-bewustzijn-module-6': 6,
 };
 
 // Geslaagd = score >= 50

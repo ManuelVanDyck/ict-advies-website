@@ -6,8 +6,17 @@ import Link from 'next/link';
 import { generateOpdrachtPDF, PDFData } from '@/lib/pdf/opdracht-pdf';
 import { Loader2, Download, Save, Send, FileText, CheckCircle2, AlertCircle, ArrowRight, RotateCcw, Lock } from 'lucide-react';
 
+interface MultipleChoiceOptie {
+  label: string;
+  waarde: string;
+  correct?: boolean;
+}
+
 interface Criterium {
   naam: string;
+  vraag?: string;
+  vraagType?: 'tekst' | 'multiple-choice';
+  opties?: MultipleChoiceOptie[];
   beschrijving: string;
   gewicht: number;
 }
@@ -40,6 +49,7 @@ const MODULE_ORDER: Record<string, number> = {
   'ai-bewustzijn-module-3': 3,
   'ai-bewustzijn-module-4': 4,
   'ai-bewustzijn-module-5': 5,
+  'ai-bewustzijn-module-6': 6,
 };
 
 const PASSING_SCORE = 50;
@@ -302,20 +312,54 @@ export default function OpdrachtTekstComponent({
         <>
           {/* Vragen */}
           <div className="space-y-6 mb-6">
-            {opdracht.criteria.map((criterium) => (
+            {opdracht.criteria.map((criterium, criteriumIndex) => (
               <div key={criterium.naam} className="bg-white rounded-lg p-4">
                 <label className="block font-semibold text-gray-800 mb-2">
-                  {criterium.naam} <span className="text-sm text-gray-500">({criterium.gewicht}%)</span>
+                  {criteriumIndex + 1}. {criterium.naam} <span className="text-sm text-gray-500">({criterium.gewicht}%)</span>
                 </label>
-                <p className="text-sm text-gray-600 mb-3">{criterium.beschrijving}</p>
-                <textarea
-                  value={antwoorden[criterium.naam] || ''}
-                  onChange={(e) => handleAntwoordChange(criterium.naam, e.target.value)}
-                  placeholder="Schrijf je antwoord hier..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green focus:border-transparent resize-y min-h-[120px]"
-                  rows={5}
-                  disabled={loading}
-                />
+                
+                {/* Toon de vraag */}
+                {criterium.vraag && (
+                  <div className="bg-gray-50 rounded-lg p-4 mb-4 border-l-4 border-brand-red">
+                    <p className="text-gray-800 whitespace-pre-wrap">{criterium.vraag}</p>
+                  </div>
+                )}
+                
+                {/* Multiple choice of tekst input */}
+                {criterium.vraagType === 'multiple-choice' && criterium.opties ? (
+                  <div className="space-y-2">
+                    {criterium.opties.map((optie) => (
+                      <label
+                        key={optie.waarde}
+                        className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                          antwoorden[criterium.naam] === optie.waarde
+                            ? 'border-brand-green bg-green-50'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name={criterium.naam}
+                          value={optie.waarde}
+                          checked={antwoorden[criterium.naam] === optie.waarde}
+                          onChange={(e) => handleAntwoordChange(criterium.naam, e.target.value)}
+                          disabled={loading}
+                          className="w-4 h-4 text-brand-green focus:ring-brand-green"
+                        />
+                        <span className="text-gray-700">{optie.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <textarea
+                    value={antwoorden[criterium.naam] || ''}
+                    onChange={(e) => handleAntwoordChange(criterium.naam, e.target.value)}
+                    placeholder="Schrijf je antwoord hier..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green focus:border-transparent resize-y min-h-[120px]"
+                    rows={5}
+                    disabled={loading}
+                  />
+                )}
               </div>
             ))}
           </div>

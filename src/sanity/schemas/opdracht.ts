@@ -1,5 +1,33 @@
 import { defineType, defineField } from 'sanity';
 
+// Multiple choice optie
+const multipleChoiceOptieType = defineType({
+  name: 'multipleChoiceOptie',
+  title: 'Optie',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'label',
+      title: 'Optie tekst',
+      type: 'string',
+      description: 'De tekst van deze optie (bv. "A) Tekst aanpassen naar leesniveau")',
+    }),
+    defineField({
+      name: 'waarde',
+      title: 'Waarde',
+      type: 'string',
+      description: 'Korte waarde voor interne verwerking (bv. "A", "B", "C", "D")',
+    }),
+    defineField({
+      name: 'correct',
+      title: 'Correct antwoord',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Vink aan als dit het correcte antwoord is',
+    }),
+  ],
+});
+
 // Criteria voor beoordeling
 const criteriumType = defineType({
   name: 'criterium',
@@ -10,35 +38,64 @@ const criteriumType = defineType({
       name: 'naam',
       title: 'Naam',
       type: 'string',
-      description: 'Naam van het criterium (bv. "Draaitabel correct")',
+      description: 'Naam van het criterium (bv. "Kennis AI-tools")',
+    }),
+    defineField({
+      name: 'vraag',
+      title: 'Vraag',
+      type: 'text',
+      rows: 3,
+      description: 'De vraag die aan de gebruiker gesteld wordt',
+    }),
+    defineField({
+      name: 'vraagType',
+      title: 'Type vraag',
+      type: 'string',
+      options: {
+        list: [
+          { title: '📝 Tekst antwoord', value: 'tekst' },
+          { title: '⭕ Multiple choice', value: 'multiple-choice' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'tekst',
+      description: 'Kies hoe de gebruiker moet antwoorden',
+    }),
+    defineField({
+      name: 'opties',
+      title: 'Multiple choice opties',
+      type: 'array',
+      of: [{ type: 'multipleChoiceOptie' }],
+      description: 'De opties voor multiple choice vragen',
+      hidden: ({ parent }) => parent?.vraagType !== 'multiple-choice',
     }),
     defineField({
       name: 'beschrijving',
-      title: 'Beschrijving',
+      title: 'Beschrijving (voor AI correctie)',
       type: 'text',
       rows: 2,
-      description: 'Wat wordt er geëvalueerd',
+      description: 'Wat wordt er geëvalueerd - dit wordt gebruikt door de AI voor correctie',
     }),
     defineField({
       name: 'verwacht',
       title: 'Verwacht resultaat',
       type: 'text',
       rows: 3,
-      description: 'Wat moet er precies in de sheet staan? (bv. "Eerste draaitabel toont geslacht vs geslaagd met GEMIDDELDE STUDIETIJD")',
+      description: 'Wat moet er precies in het antwoord staan?',
     }),
     defineField({
       name: 'controleer',
       title: 'Controleer op',
       type: 'array',
       of: [{ type: 'string' }],
-      description: 'Specifieke dingen om te controleren in de data',
+      description: 'Specifieke dingen om te controleren',
     }),
     defineField({
       name: 'gewicht',
-      title: 'Gewicht',
+      title: 'Gewicht (%)',
       type: 'number',
-      initialValue: 1,
-      description: 'Hoe zwaar dit criterium telt (1-10)',
+      initialValue: 25,
+      description: 'Hoe zwaar dit criterium telt',
     }),
   ],
 });
@@ -120,4 +177,4 @@ export default defineType({
   ],
 });
 
-export { criteriumType };
+export { criteriumType, multipleChoiceOptieType };

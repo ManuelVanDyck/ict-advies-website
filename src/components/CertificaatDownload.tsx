@@ -23,6 +23,7 @@ const MODULE_TITELS: Record<string, string> = {
   'ai-bewustzijn-module-3': 'Het didactische proces (6 stappen)',
   'ai-bewustzijn-module-4': 'Professionalisering & netwerk',
   'ai-bewustzijn-module-5': 'Google AI Training',
+  'ai-bewustzijn-module-6': 'Concreet aan de slag met AI',
 };
 
 export default function CertificaatDownload() {
