@@ -138,7 +138,7 @@ export default async function Home() {
             <FeatureCard
               icon={Lightbulb}
               title="EduTools"
-              description="Handige educatieve tools voor je lessen: Kahoot, Quizlet, Canva en meer."
+              description="Handige educatieve tools voor leerkrachten."
               href="/tutorials?categorie=edutools"
               color="orange"
             />
