@@ -97,7 +97,7 @@ export default function AdminVoortgangPage() {
   };
 
   const LEERPAD_MODULE_COUNT: Record<string, number> = {
-    'ai-bewustzijn': 5,
+    'ai-bewustzijn': 6,
   };
 
   // Group data by user, then by leerpad

@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
     ];
     const PASSING_SCORE = 50;
     const LEERPAD_MODULE_COUNT: Record<string, number> = {
-      'ai-bewustzijn': 5,
+      'ai-bewustzijn': 6,
     };
 
     // Bouw map: gebruiker_email -> leerpad_slug -> module_slug -> hoogste score
