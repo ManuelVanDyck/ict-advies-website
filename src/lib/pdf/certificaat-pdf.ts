@@ -48,7 +48,7 @@ export function generateCertificaatPDF(data: CertificaatData): Blob {
   doc.text('van professionele ontwikkeling', pageWidth / 2, y, { align: 'center' });
 
   // === MAIN CONTENT ===
-  y += 20;
+  y += 12;
 
   // Intro text
   doc.setFontSize(14);
@@ -74,7 +74,7 @@ export function generateCertificaatPDF(data: CertificaatData): Blob {
   doc.text(`"${data.leerpadTitel}"`, pageWidth / 2, y, { align: 'center' });
 
   // === MODULES ===
-  y += 18;
+  y += 12;
   doc.setFontSize(11);
   doc.setTextColor(80);
   doc.text('Voltooide modules:', pageWidth / 2, y, { align: 'center' });
@@ -104,11 +104,11 @@ export function generateCertificaatPDF(data: CertificaatData): Blob {
     doc.setTextColor(r, g, b);
     doc.text(`${module.score}%`, moduleStartX + 120, moduleY);
 
-    y += 7;
+    y += 6;
   });
 
   // === TOTAL SCORE ===
-  y += 5;
+  y += 4;
   doc.setFontSize(12);
   doc.setTextColor(60);
   doc.text(`Totaal gemiddelde: `, pageWidth / 2 - 20, y, { align: 'center' });
@@ -116,14 +116,8 @@ export function generateCertificaatPDF(data: CertificaatData): Blob {
   doc.setFontSize(14);
   doc.text(`${data.totaalScore}%`, pageWidth / 2 + 25, y, { align: 'center' });
 
-  // === DATE ===
-  y += 15;
-  doc.setFontSize(11);
-  doc.setTextColor(100);
-  doc.text(`Datum van uitreiking: ${data.datum}`, pageWidth / 2, y, { align: 'center' });
-
   // === SIGNATURE ===
-  y += 20;
+  y += 14;
 
   // Signature line
   doc.setDrawColor(150);
@@ -142,10 +136,7 @@ export function generateCertificaatPDF(data: CertificaatData): Blob {
   doc.setTextColor(100);
   doc.text('Directeur, GO! atheneum Gentbrugge', pageWidth / 2, y, { align: 'center' });
 
-  // === FOOTER ===
-  doc.setFontSize(9);
-  doc.setTextColor(150);
-  doc.text('ICT-Advies | Professionalisering', pageWidth / 2, pageHeight - 20, { align: 'center' });
+
 
   return doc.output('blob');
 }
