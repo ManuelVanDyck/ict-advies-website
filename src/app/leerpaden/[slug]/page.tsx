@@ -43,7 +43,8 @@ export default async function LeerpadDetailPage({
           criteria,
           maxScore,
           deadline,
-          verplicht
+          verplicht,
+          voorbeeld
         }
       }
     }

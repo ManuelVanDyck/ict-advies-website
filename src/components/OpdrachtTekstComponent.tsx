@@ -28,6 +28,7 @@ interface Opdracht {
   maxScore: number;
   deadline?: string;
   verplicht?: boolean;
+  voorbeeld?: string;
 }
 
 interface OpdrachtTekstComponentProps {
@@ -62,6 +63,7 @@ export default function OpdrachtTekstComponent({
   tutorialTitle,
 }: OpdrachtTekstComponentProps) {
   const { data: session } = useSession();
+  const [showTips, setShowTips] = useState(false);
   const [antwoorden, setAntwoorden] = useState<AntwoordData>({});
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
@@ -307,6 +309,37 @@ export default function OpdrachtTekstComponent({
       <div className="prose prose-sm max-w-none mb-6">
         <p className="text-gray-700">{opdracht.instructie}</p>
       </div>
+
+      {/* Tips */}
+      {opdracht.voorbeeld && (
+        <div className="mb-6">
+          <button
+            onClick={() => setShowTips(!showTips)}
+            className="w-full flex items-center justify-between bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors border border-gray-200"
+          >
+            <span className="font-semibold text-blue-600 flex items-center gap-2">
+              💡 Wil je enkele tips?
+            </span>
+            <span className={`text-blue-400 transition-transform ${showTips ? 'rotate-180' : ''}`}>
+              ▼
+            </span>
+          </button>
+          {showTips && (
+            <div className="bg-blue-50 rounded-b-lg p-4 border border-t-0 border-blue-200 -mt-px">
+              <div
+                className="text-gray-700 text-sm whitespace-pre-wrap leading-relaxed select-none"
+                onCopy={(e) => e.preventDefault()}
+                style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+              >
+                {opdracht.voorbeeld}
+              </div>
+              <p className="text-xs text-blue-500/70 mt-3 italic">
+                Gebruik deze tips als inspiratie voor je eigen antwoord.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {result === null ? (
         <>

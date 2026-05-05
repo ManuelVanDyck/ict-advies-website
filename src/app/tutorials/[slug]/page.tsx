@@ -38,7 +38,8 @@ export default async function TutorialPage({ params }: { params: Promise<{ slug:
         maxScore,
         deadline,
         verplicht,
-        screenshotOnly
+        screenshotOnly,
+        voorbeeld
       }
     }
   `, { slug });
