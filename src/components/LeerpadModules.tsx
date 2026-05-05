@@ -54,16 +54,16 @@ export default function LeerpadModules({ modules }: LeerpadModulesProps) {
     }
   };
 
-  // Map tutorial slug to module progress
+  // Map tutorial slug to module progress (all modules are always unlocked)
   const getModuleProgress = (slug: string): ModuleProgress => {
-    return progress[slug] || { completed: false, score: 0, unlocked: slug === 'ai-bewustzijn-module-1', passed: false };
+    return progress[slug] || { completed: false, score: 0, unlocked: true, passed: false };
   };
 
   return (
     <div className="space-y-6">
       {modules.map((module, idx) => {
         const moduleProgress = getModuleProgress(module.slug.current);
-        const isLocked = !moduleProgress.unlocked && idx > 0;
+        const isLocked = false; // Alle modules zijn direct beschikbaar
         const isCompleted = moduleProgress.passed;
 
         return (

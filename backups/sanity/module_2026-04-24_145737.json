@@ -1,0 +1,626 @@
+{
+    "query": "*[_type==\"module\"] | order(_createdAt asc)",
+    "result": [
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-ai-1",
+            "_rev": "U16lAXSt0wsm3LBuKdInfq",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:50Z",
+            "aiStap": 1,
+            "beschrijving": "Begrijp de basis van kunstmatige intelligentie: machine learning, taalmodellen, mogelijkheden en beperkingen.",
+            "duur": 60,
+            "praktijkopdracht": "Leg in je eigen woorden uit wat AI is aan een collega.",
+            "slug": {
+                "_type": "slug",
+                "current": "wat-is-ai"
+            },
+            "titel": "Wat is AI en hoe werkt het?",
+            "tutorials": [
+                {
+                    "_ref": "Htvkf05gV4fJEoqSQ4yjFF",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 1
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-ai-2",
+            "_rev": "U16lAXSt0wsm3LBuKdInlh",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:54Z",
+            "aiStap": 3,
+            "beschrijving": "Verken ethische vragen: bias, transparantie, auteursrecht en de impact op leerlingen.",
+            "duur": 60,
+            "praktijkopdracht": "Identificeer 3 ethische aandachtspunten bij AI-gebruik in jouw vak.",
+            "slug": {
+                "_type": "slug",
+                "current": "ai-ethiek-onderwijs"
+            },
+            "titel": "AI ethiek in het onderwijs",
+            "tutorials": [
+                {
+                    "_ref": "tutorial-ai-ethiek-onderwijs",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 2
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-ai-3",
+            "_rev": "c5vtlpFILyZX1g8KP88SgD",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:55Z",
+            "aiStap": 3,
+            "beschrijving": "Welke data mag je wel en niet invoeren in AI-tools? AVG en privacy in de praktijk.",
+            "duur": 60,
+            "praktijkopdracht": "Maak een checklist: wat mag je wel/niet in Gemini invoeren?",
+            "slug": {
+                "_type": "slug",
+                "current": "privacy-ai"
+            },
+            "titel": "Privacy & AI",
+            "tutorials": [
+                {
+                    "_ref": "tutorial-privacy-ai",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 3
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-ai-4",
+            "_rev": "U16lAXSt0wsm3LBuKdInot",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:56Z",
+            "aiStap": 5,
+            "beschrijving": "Praktische richtlijnen voor verantwoord AI-gebruik in je dagelijks werk.",
+            "duur": 60,
+            "praktijkopdracht": "Gebruik AI voor \u00e9\u00e9n taak en documenteer je beslissingen.",
+            "slug": {
+                "_type": "slug",
+                "current": "verantwoord-ai-gebruiken"
+            },
+            "titel": "Verantwoord AI gebruiken",
+            "tools": [
+                "Gemini",
+                "NotebookLM"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "tutorial-verantwoord-ai",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 4
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-basis-1",
+            "_rev": "c5vtlpFILyZX1g8KP88MTP",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:39Z",
+            "beschrijving": "Leer effectief communiceren met Gmail en Google Meet. Van e-mail opstellen tot videovergaderingen organiseren.",
+            "digcompeduDomein": "domein1",
+            "duur": 120,
+            "praktijkopdracht": "Stuur een professionele e-mail naar een collega en plan een korte Meet-vergadering in.",
+            "slug": {
+                "_type": "slug",
+                "current": "digitaal-communiceren"
+            },
+            "titel": "Digitaal communiceren",
+            "tools": [
+                "Gmail",
+                "Google Meet"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "8tqAwYeDTNDUPg599gDlix",
+                    "_type": "reference"
+                },
+                {
+                    "_ref": "tutorial-google-meet",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 1
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-basis-2",
+            "_rev": "jFKs3MHzKp9U5Caat4Y4AG",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:40Z",
+            "beschrijving": "Organiseer je bestanden in Google Drive en werk samen in Google Docs.",
+            "digcompeduDomein": "domein2",
+            "duur": 120,
+            "praktijkopdracht": "Maak een gedeelde mapstructuur voor je vak en deel een document met een collega.",
+            "slug": {
+                "_type": "slug",
+                "current": "documenten-beheren"
+            },
+            "titel": "Documenten beheren",
+            "tools": [
+                "Google Drive",
+                "Google Docs"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "01V69ip6laclT1AsFar35T",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 2
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-basis-3",
+            "_rev": "c5vtlpFILyZX1g8KP88NeT",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:41Z",
+            "beschrijving": "Maak aantrekkelijke presentaties met Google Slides voor je lessen.",
+            "digcompeduDomein": "domein3",
+            "duur": 120,
+            "praktijkopdracht": "Bouw een lespresentatie met minimaal 10 slides, afbeeldingen en animaties.",
+            "slug": {
+                "_type": "slug",
+                "current": "presentaties-maken"
+            },
+            "titel": "Presentaties maken",
+            "tools": [
+                "Google Slides"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "Gd6YsNZdRpmvsYg22diO4g",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 3
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-basis-4",
+            "_rev": "jFKs3MHzKp9U5Caat4Y4eF",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:43Z",
+            "beschrijving": "Zet je eerste Google Classroom op en leer de basisfuncties kennen.",
+            "digcompeduDomein": "domein3",
+            "duur": 120,
+            "praktijkopdracht": "Maak een Classroom voor \u00e9\u00e9n van je klassen en plaats je eerste opdracht.",
+            "slug": {
+                "_type": "slug",
+                "current": "classroom-starten"
+            },
+            "titel": "Classroom starten",
+            "tools": [
+                "Google Classroom"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "01V69ip6laclT1AsFar2kB",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 4
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-basis-5",
+            "_rev": "c5vtlpFILyZX1g8KP88QTp",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:50Z",
+            "beschrijving": "Ontdek wat AI is, hoe het werkt en maak kennis met Gemini.",
+            "duur": 120,
+            "praktijkopdracht": "Stel 5 vragen aan Gemini en bespreek de antwoorden met een collega.",
+            "slug": {
+                "_type": "slug",
+                "current": "wat-is-ai-intro"
+            },
+            "titel": "Wat is AI?",
+            "tools": [
+                "Gemini"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "Htvkf05gV4fJEoqSQ4yjFF",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 5
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-innovatie-1",
+            "_rev": "U16lAXSt0wsm3LBuKdInz0",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:32:01Z",
+            "beschrijving": "Ontwikpel effici\u00ebnte workflows voor je school of team.",
+            "digcompeduDomein": "domein1",
+            "duur": 120,
+            "praktijkopdracht": "Ontwerp een workflow voor een terugkerend proces in je school.",
+            "slug": {
+                "_type": "slug",
+                "current": "schoolbrede-workflows"
+            },
+            "titel": "Schoolbrede workflows",
+            "tools": [
+                "Google Drive",
+                "Google Admin"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "tutorial-google-admin-basis",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 1
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-innovatie-2",
+            "_rev": "c5vtlpFILyZX1g8KP88Udz",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:32:02Z",
+            "beschrijving": "Organiseer trainingen en kennisdeling voor collega's.",
+            "digcompeduDomein": "domein1",
+            "duur": 120,
+            "praktijkopdracht": "Plan en organiseer een digitale training voor je collega's.",
+            "slug": {
+                "_type": "slug",
+                "current": "professionalisering-organiseren"
+            },
+            "titel": "Professionalisering organiseren",
+            "tools": [
+                "Google Meet",
+                "Google Sites"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "tutorial-google-sites",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 2
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-innovatie-3",
+            "_rev": "jFKs3MHzKp9U5Caat1vQsY",
+            "_type": "module",
+            "_updatedAt": "2026-03-03T20:14:29Z",
+            "beschrijving": "Leid een innovatieproject rond digitale tools of AI in je school.",
+            "digcompeduDomein": "domein3",
+            "duur": 120,
+            "praktijkopdracht": "Schrijf een projectplan voor een digitale innovatie in je school.",
+            "slug": {
+                "_type": "slug",
+                "current": "innovatieproject"
+            },
+            "titel": "Innovatieproject",
+            "volgorde": 3
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-innovatie-4",
+            "_rev": "U16lAXSt0wsm3LBuKdInk6",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:53Z",
+            "aiStap": 1,
+            "beschrijving": "Gebruik Gemini voor complexe taken: data-analyse, content creatie, automatisering.",
+            "duur": 120,
+            "praktijkopdracht": "Automatiseer een terugkerende taak met hulp van Gemini.",
+            "slug": {
+                "_type": "slug",
+                "current": "gemini-geavanceerd"
+            },
+            "titel": "Gemini geavanceerd",
+            "tools": [
+                "Gemini"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "Htvkf05gV4fJEoqSQ4yjFF",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 4
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-integratie-1",
+            "_rev": "U16lAXSt0wsm3LBuKdInCZ",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:42Z",
+            "beschrijving": "Werk effici\u00ebnt samen aan documenten met commentaar, suggesties en versiegeschiedenis.",
+            "digcompeduDomein": "domein1",
+            "duur": 120,
+            "praktijkopdracht": "Werk samen met een collega aan \u00e9\u00e9n document en gebruik de samenwerkingsfuncties.",
+            "slug": {
+                "_type": "slug",
+                "current": "samenwerken-drive"
+            },
+            "titel": "Samenwerken in Drive",
+            "tools": [
+                "Google Drive",
+                "Google Docs"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "01V69ip6laclT1AsFqDuoV",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 1
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-integratie-2",
+            "_rev": "c5vtlpFILyZX1g8KP88Pqr",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:48Z",
+            "beschrijving": "Maak quizzes en enqu\u00eates met Google Forms en analyseer de resultaten in Sheets.",
+            "digcompeduDomein": "domein4",
+            "duur": 120,
+            "praktijkopdracht": "Maak een korte quiz voor je les en bekijk de resultaten in Sheets.",
+            "slug": {
+                "_type": "slug",
+                "current": "evalueren-forms"
+            },
+            "titel": "Evalueren met Forms",
+            "tools": [
+                "Google Forms",
+                "Google Sheets"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "01V69ip6laclT1AsFqDy4l",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 2
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-integratie-3",
+            "_rev": "jFKs3MHzKp9U5Caat4Y4xK",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:44Z",
+            "beschrijving": "Gebruik geavanceerde Classroom functies: rubrics, cijfers, planning en differentiatie.",
+            "digcompeduDomein": "domein3",
+            "duur": 120,
+            "praktijkopdracht": "Maak een rubric voor een opdracht en plan lessen voor de komende week.",
+            "slug": {
+                "_type": "slug",
+                "current": "classroom-verdieping"
+            },
+            "titel": "Classroom verdieping",
+            "tools": [
+                "Google Classroom"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "tutorial-classroom-verdieping",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 3
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-integratie-4",
+            "_rev": "c5vtlpFILyZX1g8KP88P91",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:46Z",
+            "beschrijving": "Leer basis formules en grafieken maken in Google Sheets.",
+            "digcompeduDomein": "domein4",
+            "duur": 120,
+            "praktijkopdracht": "Maak een cijferlijst met formules en een overzichtelijke grafiek.",
+            "slug": {
+                "_type": "slug",
+                "current": "data-verwerken"
+            },
+            "titel": "Data verwerken",
+            "tools": [
+                "Google Sheets"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "tutorial-google-sheets-basis",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 4
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-integratie-5",
+            "_rev": "c5vtlpFILyZX1g8KP88T9R",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:59Z",
+            "beschrijving": "Leer leerlingen mediawijs maken en ga correct om met privacy en GDPR.",
+            "digcompeduDomein": "domein6",
+            "duur": 120,
+            "praktijkopdracht": "Maak een korte les over mediawijsheid of privacy voor je leerlingen.",
+            "slug": {
+                "_type": "slug",
+                "current": "mediawijsheid-privacy"
+            },
+            "titel": "Mediawijsheid & privacy",
+            "tutorials": [
+                {
+                    "_ref": "tutorial-gdpr-leerkrachten",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 5
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-integratie-6",
+            "_rev": "jFKs3MHzKp9U5Caat4Y6H6",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:51Z",
+            "aiStap": 1,
+            "beschrijving": "Gebruik Gemini voor lesvoorbereiding en NotebookLM om documenten te analyseren.",
+            "duur": 120,
+            "praktijkopdracht": "Bereid een les voor met hulp van Gemini en maak een Notebook van je cursusmateriaal.",
+            "slug": {
+                "_type": "slug",
+                "current": "gemini-notebooklm-basis"
+            },
+            "titel": "Gemini & NotebookLM basis",
+            "tools": [
+                "Gemini",
+                "NotebookLM"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "notebooklm-tutorial-2026",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 6
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-verdieping-1",
+            "_rev": "U16lAXSt0wsm3LBuKdInU8",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:47Z",
+            "beschrijving": "Analyseer toetsresultaten en leerwinst met geavanceerde Sheets-functies.",
+            "digcompeduDomein": "domein4",
+            "duur": 120,
+            "praktijkopdracht": "Analyseer de resultaten van een toets en maak een rapport met inzichten.",
+            "slug": {
+                "_type": "slug",
+                "current": "leerdata-analyseren"
+            },
+            "titel": "Leerdata analyseren",
+            "tools": [
+                "Google Sheets",
+                "Google Forms"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "tutorial-sheets-data-analyse",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 1
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-verdieping-2",
+            "_rev": "c5vtlpFILyZX1g8KP88Okf",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:45Z",
+            "beschrijving": "Differentieer opdrachten en leerpaden binnen Google Classroom.",
+            "digcompeduDomein": "domein3",
+            "duur": 120,
+            "praktijkopdracht": "Maak gedifferentieerde opdrachten voor drie niveaus binnen \u00e9\u00e9n klas.",
+            "slug": {
+                "_type": "slug",
+                "current": "differentieren-classroom"
+            },
+            "titel": "Differenti\u00ebren met Classroom",
+            "tools": [
+                "Google Classroom"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "tutorial-classroom-differentiatie",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 2
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-verdieping-3",
+            "_rev": "U16lAXSt0wsm3LBuKdIniV",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:52Z",
+            "aiStap": 4,
+            "beschrijving": "Gebruik NotebookLM als studiehulp en kennisbron voor leerlingen.",
+            "digcompeduDomein": "domein3",
+            "duur": 120,
+            "praktijkopdracht": "Maak een interactieve Notebook die leerlingen kunnen gebruiken bij het studeren.",
+            "slug": {
+                "_type": "slug",
+                "current": "notebooklm-klas"
+            },
+            "titel": "NotebookLM in de klas",
+            "tools": [
+                "NotebookLM"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "notebooklm-lesvoorbereiding",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 3
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-verdieping-4",
+            "_rev": "c5vtlpFILyZX1g8KP88U11",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:32:00Z",
+            "beschrijving": "Deel je digitale expertise met collega's en ondersteun hen bij vragen.",
+            "digcompeduDomein": "domein1",
+            "duur": 120,
+            "praktijkopdracht": "Geef een korte workshop of \u00e9\u00e9n-op-\u00e9\u00e9n coaching aan een collega.",
+            "slug": {
+                "_type": "slug",
+                "current": "collegas-coachen"
+            },
+            "titel": "Collega's coachen",
+            "tools": [
+                "Google Meet",
+                "Google Drive"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "tutorial-digitaal-coachen",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 4
+        },
+        {
+            "_createdAt": "2026-03-03T20:14:29Z",
+            "_id": "module-verdieping-5",
+            "_rev": "jFKs3MHzKp9U5Caat4Y7as",
+            "_type": "module",
+            "_updatedAt": "2026-03-04T09:31:57Z",
+            "aiStap": 3,
+            "beschrijving": "Pas de 7 sleutelvoorwaarden toe bij het gebruiken van AI in je lessen.",
+            "duur": 120,
+            "praktijkopdracht": "Evalueer \u00e9\u00e9n AI-tool op de 7 sleutelvoorwaarden en beslis of je het inzet.",
+            "slug": {
+                "_type": "slug",
+                "current": "ai-tools-verantwoord"
+            },
+            "titel": "AI-tools verantwoord gebruiken",
+            "tools": [
+                "Gemini"
+            ],
+            "tutorials": [
+                {
+                    "_ref": "tutorial-verantwoord-ai",
+                    "_type": "reference"
+                }
+            ],
+            "volgorde": 5
+        }
+    ],
+    "syncTags": [
+        "s1:Pj2THQ"
+    ],
+    "ms": 4
+}

@@ -1,0 +1,99 @@
+{
+    "query": "*[_type==\"category\"] | order(_createdAt asc)",
+    "result": [
+        {
+            "_createdAt": "2026-02-28T10:56:20Z",
+            "_id": "01V69ip6laclT1AsFar1yH",
+            "_rev": "01V69ip6laclT1AsFar1sx",
+            "_type": "category",
+            "_updatedAt": "2026-02-28T10:56:20Z",
+            "description": "Handleidingen voor het Clevertouch Impact Plus digibord",
+            "slug": {
+                "_type": "slug",
+                "current": "clevertouch"
+            },
+            "title": "Clevertouch"
+        },
+        {
+            "_createdAt": "2026-02-28T10:56:21Z",
+            "_id": "8tqAwYeDTNDUPg599XKNWa",
+            "_rev": "8tqAwYeDTNDUPg599XKNTd",
+            "_type": "category",
+            "_updatedAt": "2026-02-28T10:56:21Z",
+            "description": "Handleidingen voor Google tools in het onderwijs",
+            "slug": {
+                "_type": "slug",
+                "current": "google-workspace"
+            },
+            "title": "Google Workspace"
+        },
+        {
+            "_createdAt": "2026-02-28T10:56:22Z",
+            "_id": "8tqAwYeDTNDUPg599XKNiO",
+            "_rev": "3cR3a1NSd7XynftmT8XYfb",
+            "_system": {
+                "base": {
+                    "id": "8tqAwYeDTNDUPg599XKNiO",
+                    "rev": "8tqAwYeDTNDUPg599jiGhv"
+                }
+            },
+            "_type": "category",
+            "_updatedAt": "2026-03-27T21:34:20Z",
+            "description": "Handige educatieve tools voor leerkrachten.",
+            "slug": {
+                "_type": "slug",
+                "current": "edutools"
+            },
+            "title": "EduTools"
+        },
+        {
+            "_createdAt": "2026-03-13T09:18:46Z",
+            "_id": "0858f144-4300-4928-913a-1079f9b3b9fe",
+            "_rev": "7Lth8w1jA20JqbnelCNJlC",
+            "_system": {
+                "base": {
+                    "id": "0858f144-4300-4928-913a-1079f9b3b9fe",
+                    "rev": "osnJeRBom7V2w5tRKUYUfw"
+                }
+            },
+            "_type": "category",
+            "_updatedAt": "2026-03-13T14:57:06Z",
+            "description": "Mediawijs omgaan met AI.",
+            "slug": {
+                "_type": "slug",
+                "current": "mediawijs"
+            },
+            "title": "Mediawijs"
+        },
+        {
+            "_createdAt": "2026-03-13T14:58:03Z",
+            "_id": "36b14c4e-2acd-4bf8-a322-98bdef24cfe8",
+            "_rev": "sEXYKEM0YtrucL1vKuke11",
+            "_type": "category",
+            "_updatedAt": "2026-03-13T14:58:40Z",
+            "description": "AI hulp bij je lesvoorbereidingen",
+            "slug": {
+                "_type": "slug",
+                "current": "ai-tools"
+            },
+            "title": "AI Tools"
+        },
+        {
+            "_createdAt": "2026-03-15T23:49:51Z",
+            "_id": "sEXYKEM0YtrucL1vLCOH5s",
+            "_rev": "sEXYKEM0YtrucL1vLCOH0z",
+            "_type": "category",
+            "_updatedAt": "2026-03-15T23:49:51Z",
+            "description": "Kosteloze online trainingen van Google voor Education.",
+            "slug": {
+                "_type": "slug",
+                "current": "google-online-trainingen"
+            },
+            "title": "Google - Online trainingen"
+        }
+    ],
+    "syncTags": [
+        "s1:i0ewyw"
+    ],
+    "ms": 3
+}

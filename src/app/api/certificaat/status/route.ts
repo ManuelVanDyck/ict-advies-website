@@ -4,14 +4,14 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-// Module volgorde voor AI Bewustzijn leerpad
+// Module volgorde voor AI Bewustzijn leerpad (stijgende moeilijkheid)
 const MODULE_ORDER = [
-  'ai-bewustzijn-module-1',
-  'ai-bewustzijn-module-2',
-  'ai-bewustzijn-module-3',
-  'ai-bewustzijn-module-4',
-  'ai-bewustzijn-module-5',
-  'ai-bewustzijn-module-6',
+  'ai-bewustzijn-module-5', // Google AI Training (laagdrempelig, praktisch)
+  'ai-bewustzijn-module-6', // Concreet aan de slag met AI (praktisch)
+  'ai-bewustzijn-module-1', // Visievorming – De mens aan het roer (conceptueel)
+  'ai-bewustzijn-module-3', // Het didactische proces (methodisch)
+  'ai-bewustzijn-module-2', // Betrouwbaarheid toetsen (analytisch, zwaar)
+  'ai-bewustzijn-module-4', // Professionalisering & netwerk (reflectie, afsluiter)
 ];
 
 const PASSING_SCORE = 50;

@@ -30,7 +30,7 @@ export default async function LeerpadDetailPage({
       leerdoelstellingen,
       voorkennis,
       voorbereiding,
-      modules[]->{
+      "modules": modules[]->{
         _id,
         title,
         slug,
@@ -48,6 +48,22 @@ export default async function LeerpadDetailPage({
       }
     }
   `, { slug });
+
+  // Reorder modules: 5,6,1,3,2,4 (stijgende moeilijkheid)
+  if (leerpad?.modules) {
+    const desiredOrder = [
+      'ai-bewustzijn-module-5',
+      'ai-bewustzijn-module-6',
+      'ai-bewustzijn-module-1',
+      'ai-bewustzijn-module-3',
+      'ai-bewustzijn-module-2',
+      'ai-bewustzijn-module-4',
+    ];
+    const moduleMap = new Map(leerpad.modules.map((m: any) => [m.slug?.current, m]));
+    leerpad.modules = desiredOrder
+      .map(slug => moduleMap.get(slug))
+      .filter(Boolean);
+  }
 
   if (!leerpad) {
     notFound();

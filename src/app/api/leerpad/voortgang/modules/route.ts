@@ -4,14 +4,15 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-// Module volgorde voor AI Bewustzijn leerpad
+// Module volgorde voor AI Bewustzijn leerpad (stijgende moeilijkheid)
+// Alle modules zijn direct beschikbaar (geen sequential unlock)
 const MODULE_ORDER: Record<string, number> = {
-  'ai-bewustzijn-module-1': 1,
-  'ai-bewustzijn-module-2': 2,
-  'ai-bewustzijn-module-3': 3,
-  'ai-bewustzijn-module-4': 4,
-  'ai-bewustzijn-module-5': 5,
-  'ai-bewustzijn-module-6': 6,
+  'ai-bewustzijn-module-5': 1, // Google AI Training
+  'ai-bewustzijn-module-6': 2, // Concreet aan de slag met AI
+  'ai-bewustzijn-module-1': 3, // Visievorming – De mens aan het roer
+  'ai-bewustzijn-module-3': 4, // Het didactische proces
+  'ai-bewustzijn-module-2': 5, // Betrouwbaarheid toetsen
+  'ai-bewustzijn-module-4': 6, // Professionalisering & netwerk
 };
 
 // Geslaagd = score >= 50
@@ -85,22 +86,11 @@ export async function GET(request: NextRequest) {
     const passed = score >= PASSING_SCORE;
     const completed = data?.completed || false;
 
-    // Module 1 is altijd unlocked
-    // Module N is unlocked als Module N-1 passed is
-    let unlocked = index === 0;
-
-    if (index > 0) {
-      const prevSlug = moduleSlugs[index - 1];
-      const prevData = slugToData[prevSlug];
-      const prevScore = prevData?.score || 0;
-      const prevPassed = prevScore >= PASSING_SCORE;
-      unlocked = prevPassed;
-    }
-
+    // Alle modules zijn direct beschikbaar (geen sequential unlock)
     moduleProgress[slug] = {
       completed,
       score,
-      unlocked,
+      unlocked: true,
       passed,
     };
   });

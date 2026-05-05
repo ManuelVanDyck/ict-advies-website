@@ -1,0 +1,8 @@
+{
+    "query": "*[_type==\"opdracht\"] | order(_createdAt asc)",
+    "result": [],
+    "syncTags": [
+        "s1:Q3oCFA"
+    ],
+    "ms": 1
+}
