@@ -16,6 +16,7 @@ interface Opdracht {
   maxScore: number;
   deadline?: string;
   screenshotOnly?: boolean;
+  voorbeeld?: string;
 }
 
 interface OpdrachtClientProps {

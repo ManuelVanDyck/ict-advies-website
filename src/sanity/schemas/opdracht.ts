@@ -167,6 +167,14 @@ export default defineType({
       hidden: ({ parent }) => !parent?.ingeschakeld,
     }),
     defineField({
+      name: 'voorbeeld',
+      title: 'Voorbeeld oplossing',
+      type: 'text',
+      rows: 8,
+      description: 'Een voorbeeld van een goede oplossing. Dit wordt getoond aan cursisten als hulp, maar ze kunnen het niet kopiëren als hun eigen antwoord.',
+      hidden: ({ parent }) => !parent?.ingeschakeld,
+    }),
+    defineField({
       name: 'screenshotOnly',
       title: 'Alleen screenshot upload',
       type: 'boolean',

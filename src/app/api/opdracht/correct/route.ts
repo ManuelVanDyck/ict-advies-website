@@ -16,6 +16,7 @@ interface CorrectionRequest {
   criteria: Criterium[];
   maxScore: number;
   screenshots?: string[]; // Base64 encoded images
+  voorbeeld?: string; // Het voorbeeld dat niet gekopieerd mag worden
 }
 
 const claudeApiKey = process.env.ANTHROPIC_API_KEY;
@@ -731,7 +732,7 @@ async function correctWithZai(
 export async function POST(request: NextRequest) {
   try {
     const body: CorrectionRequest = await request.json();
-    const { inzendingId, sheetUrl, pdfUrl, criteria, maxScore, screenshots } = body;
+    const { inzendingId, sheetUrl, pdfUrl, criteria, maxScore, screenshots, voorbeeld } = body;
 
     console.log('[Correctie] Request ontvangen:', { 
       inzendingId, 
@@ -755,6 +756,36 @@ export async function POST(request: NextRequest) {
 
     // Read sheet content if URL provided
     const sheetContent = sheetUrl ? await readSheetContent(sheetUrl) : null;
+
+    // Check if submission matches the example (anti-plagiarism)
+    if (voorbeeld) {
+      const normalizedSubmission = (sheetContent || '').toLowerCase().trim();
+      const normalizedVoorbeeld = voorbeeld.toLowerCase().trim();
+      // Check if more than 70% of the example text appears in the submission
+      const voorbeeldSentences = normalizedVoorbeeld.split(/[.!\n]+/).filter((s: string) => s.trim().length > 20);
+      const matchedSentences = voorbeeldSentences.filter((s: string) => normalizedSubmission.includes(s.trim()));
+      const matchRatio = voorbeeldSentences.length > 0 ? matchedSentences.length / voorbeeldSentences.length : 0;
+      
+      if (matchRatio > 0.7) {
+        // Submission is too similar to the example
+        await admin
+          .from('opdracht_inzendingen')
+          .update({
+            score: 0,
+            feedback: 'Je inzending lijkt erg sterk op het voorbeeld. Het voorbeeld is bedoeld als inspiratie, niet als antwoord. Schrijf je eigen antwoord op basis van jouw eigen ervaring en context.',
+            status: 'voltooid',
+            completed_at: new Date().toISOString(),
+          })
+          .eq('id', inzendingId);
+        
+        return NextResponse.json({
+          success: true,
+          score: 0,
+          feedback: 'Je inzending lijkt erg sterk op het voorbeeld. Het voorbeeld is bedoeld als inspiratie, niet als antwoord. Schrijf je eigen antwoord op basis van jouw eigen ervaring en context.',
+          details: {},
+        });
+      }
+    }
 
     // Get AI correction (with screenshots, sheet content, or both)
     const correction = await correctWithAI(sheetUrl, pdfUrl, criteria, maxScore, sheetContent, screenshots);

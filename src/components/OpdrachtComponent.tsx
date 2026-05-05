@@ -21,6 +21,7 @@ interface Opdracht {
   maxScore: number;
   deadline?: string;
   screenshotOnly?: boolean;
+  voorbeeld?: string;
 }
 
 interface OpdrachtComponentProps {
@@ -168,6 +169,7 @@ export default function OpdrachtComponent({
           screenshots: screenshots.length > 0 ? screenshots : undefined,
           criteria: opdracht.criteria,
           maxScore: opdracht.maxScore,
+          voorbeeld: opdracht.voorbeeld || undefined,
         }),
       });
 
@@ -222,6 +224,25 @@ export default function OpdrachtComponent({
           >
             📂 Open Template Sheet
           </a>
+        )}
+
+        {/* Voorbeeld oplossing */}
+        {opdracht.voorbeeld && (
+          <div className="bg-blue-500/10 backdrop-blur rounded-xl p-4 border border-blue-400/30">
+            <h4 className="font-semibold text-blue-300 mb-3 flex items-center gap-2">
+              💡 Voorbeeld oplossing
+            </h4>
+            <div 
+              className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto pr-2 select-none"
+              onCopy={(e) => e.preventDefault()}
+              style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+            >
+              {opdracht.voorbeeld}
+            </div>
+            <p className="text-xs text-blue-400/70 mt-3 italic">
+              ⚠️ Dit is een voorbeeld ter inspiratie. Je kan het niet kopiëren — schrijf je eigen antwoord!
+            </p>
+          </div>
         )}
 
         {/* Criteria */}
