@@ -36,6 +36,7 @@ export default function OpdrachtComponent({
   tutorialSlug
 }: OpdrachtComponentProps) {
   const { data: session } = useSession();
+  const [showTips, setShowTips] = useState(false);
   const [sheetUrl, setSheetUrl] = useState('');
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -226,22 +227,34 @@ export default function OpdrachtComponent({
           </a>
         )}
 
-        {/* Voorbeeld oplossing */}
+        {/* Tips */}
         {opdracht.voorbeeld && (
-          <div className="bg-blue-500/10 backdrop-blur rounded-xl p-4 border border-blue-400/30">
-            <h4 className="font-semibold text-blue-300 mb-3 flex items-center gap-2">
-              💡 Voorbeeld oplossing
-            </h4>
-            <div 
-              className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto pr-2 select-none"
-              onCopy={(e) => e.preventDefault()}
-              style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+          <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+            <button
+              onClick={() => setShowTips(!showTips)}
+              className="w-full flex items-center justify-between text-left"
             >
-              {opdracht.voorbeeld}
-            </div>
-            <p className="text-xs text-blue-400/70 mt-3 italic">
-              ⚠️ Dit is een voorbeeld ter inspiratie. Je kan het niet kopiëren — schrijf je eigen antwoord!
-            </p>
+              <span className="font-semibold text-blue-300 flex items-center gap-2">
+                💡 Wil je enkele tips?
+              </span>
+              <span className={`text-blue-400 transition-transform ${showTips ? 'rotate-180' : ''}`}>
+                ▼
+              </span>
+            </button>
+            {showTips && (
+              <div className="mt-4 space-y-2">
+                <div 
+                  className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed select-none"
+                  onCopy={(e) => e.preventDefault()}
+                  style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+                >
+                  {opdracht.voorbeeld}
+                </div>
+                <p className="text-xs text-blue-400/60 italic">
+                  Gebruik deze tips als inspiratie voor je eigen antwoord.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
